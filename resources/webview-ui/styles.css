@@ -1,0 +1,15 @@
+h1 {
+  font-size: 1.5em;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+.chart-container {
+  width: 100%;
+  height: 100%;
+}
