@@ -628,8 +628,8 @@
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
 		"@types/glob": "8.1.0",
-		"@types/lodash": "4.17.0",
-		"@types/node": "20.12.7",
+		"@types/lodash": "4.17.1",
+		"@types/node": "20.12.10",
 		"@types/uuid": "9.0.8",
 		"json": "11.0.0",
 		"ts-loader": "9.5.1"
