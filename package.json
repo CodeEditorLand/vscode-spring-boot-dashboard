@@ -587,23 +587,23 @@
 	},
 	"dependencies": {
 		"@pivotal-tools/jvm-launch-utils": "0.0.11",
-		"chart.js": "^3.9.1",
-		"chartjs": "^0.3.24",
-		"chartjs-adapter-moment": "^1.0.0",
-		"get-port": "^5.1.1",
-		"lodash": "^4.17.21",
-		"moment": "^2.29.4",
-		"pidtree": "^0.6.0",
-		"uuid": "^3.4.0"
+		"chart.js": "3.9.1",
+		"chartjs": "0.3.24",
+		"chartjs-adapter-moment": "1.0.0",
+		"get-port": "5.1.1",
+		"lodash": "4.17.21",
+		"moment": "2.29.4",
+		"pidtree": "0.6.0",
+		"uuid": "3.4.0"
 	},
 	"description": "Spring Boot Dashboard for VS Code",
 	"devDependencies": {
-		"@types/glob": "^7.2.0",
-		"@types/lodash": "^4.14.186",
-		"@types/node": "^14.18.32",
-		"@types/uuid": "^3.4.10",
-		"json": "^11.0.0",
-		"ts-loader": "^9.4.2"
+		"@types/glob": "7.2.0",
+		"@types/lodash": "4.14.186",
+		"@types/node": "14.18.32",
+		"@types/uuid": "3.4.10",
+		"json": "11.0.0",
+		"ts-loader": "9.4.2"
 	},
 	"displayName": "Spring Boot Dashboard",
 	"extensionDependencies": [
