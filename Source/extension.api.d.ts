@@ -4,37 +4,46 @@ import { Event, ThemeIcon, Uri } from "vscode";
  */
 
 export interface ExtensionAPI {
-    registerRemoteBootAppDataProvider: (providerName: string, provider: RemoteBootAppDataProvider, options?: RemoteBootAppDataProviderOptions) => void;
-    connectRemoteApp: (appData: RemoteBootAppData) => void;
-    disconnectRemoteApp: (appData: RemoteBootAppData) => void;
+	registerRemoteBootAppDataProvider: (
+		providerName: string,
+		provider: RemoteBootAppDataProvider,
+		options?: RemoteBootAppDataProviderOptions,
+	) => void;
+	connectRemoteApp: (appData: RemoteBootAppData) => void;
+	disconnectRemoteApp: (appData: RemoteBootAppData) => void;
 }
 
 export interface RemoteBootAppData {
-    name: string;
-    group?: string;
-    description?: string;
+	name: string;
+	group?: string;
+	description?: string;
 
-    /**
-     * Icon for apps. See vscode.TreeItem.iconPath
-     */
-    iconPath?: string | Uri | { light: string | Uri; dark: string | Uri } | ThemeIcon;
+	/**
+	 * Icon for apps. See vscode.TreeItem.iconPath
+	 */
+	iconPath?:
+		| string
+		| Uri
+		| { light: string | Uri; dark: string | Uri }
+		| ThemeIcon;
 
-    // required data for live conncetion
-    host: string;
-    jmxurl: string;
-
+	// required data for live conncetion
+	host: string;
+	jmxurl: string;
 }
 
 export interface RemoteBootAppDataProviderOptions {
-    /**
-     * Icon for root node of the provider. See vscode.TreeItem.iconPath
-     */
-    iconPath?: string | Uri | { light: string | Uri; dark: string | Uri } | ThemeIcon;
-
+	/**
+	 * Icon for root node of the provider. See vscode.TreeItem.iconPath
+	 */
+	iconPath?:
+		| string
+		| Uri
+		| { light: string | Uri; dark: string | Uri }
+		| ThemeIcon;
 }
 
 export interface RemoteBootAppDataProvider {
-    onDidChangeData?: Event<void>;
-    provide(): Thenable<RemoteBootAppData[]> | RemoteBootAppData[];
+	onDidChangeData?: Event<void>;
+	provide(): Thenable<RemoteBootAppData[]> | RemoteBootAppData[];
 }
-
