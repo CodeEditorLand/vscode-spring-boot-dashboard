@@ -587,7 +587,7 @@
 	},
 	"dependencies": {
 		"@pivotal-tools/jvm-launch-utils": "0.0.23",
-		"chart.js": "4.4.3",
+		"chart.js": "4.4.4",
 		"chartjs": "0.3.24",
 		"chartjs-adapter-moment": "1.0.1",
 		"get-port": "7.1.0",
@@ -600,7 +600,7 @@
 	"devDependencies": {
 		"@types/glob": "8.1.0",
 		"@types/lodash": "4.17.7",
-		"@types/node": "22.4.0",
+		"@types/node": "22.5.0",
 		"@types/uuid": "10.0.0",
 		"json": "11.0.0",
 		"ts-loader": "9.5.1"
