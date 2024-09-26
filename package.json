@@ -605,7 +605,7 @@
 	"devDependencies": {
 		"@types/glob": "8.1.0",
 		"@types/lodash": "4.17.9",
-		"@types/node": "22.6.0",
+		"@types/node": "22.7.2",
 		"@types/uuid": "10.0.0",
 		"json": "11.0.0",
 		"ts-loader": "9.5.1"
