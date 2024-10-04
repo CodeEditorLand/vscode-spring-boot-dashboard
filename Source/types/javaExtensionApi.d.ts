@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { Event, Uri } from 'vscode';
+import { Event, Uri } from "vscode";
 
-export type GetClasspathsCommand = (uri: string, options: ClasspathQueryOptions) => Promise<ClasspathResult>;
+export type GetClasspathsCommand = (
+	uri: string,
+	options: ClasspathQueryOptions,
+) => Promise<ClasspathResult>;
 
 export type ClasspathQueryOptions = {
 	/**

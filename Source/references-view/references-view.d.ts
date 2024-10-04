@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
 /**
  * This interface describes the shape for the references viewlet API. It consists
@@ -20,7 +20,6 @@ import * as vscode from 'vscode';
  * ```
  */
 export interface SymbolTree {
-
 	/**
 	 * Set the contents of the references viewlet.
 	 *
@@ -35,7 +34,6 @@ export interface SymbolTree {
  * must resolve to a model.
  */
 export interface SymbolTreeInput<T> {
-
 	/**
 	 * The value of the `reference-list.source` context key. Use this to control
 	 * input dependent commands.
@@ -75,7 +73,6 @@ export interface SymbolTreeInput<T> {
  * A symbol tree model which is used to populate the symbols tree.
  */
 export interface SymbolTreeModel<T> {
-
 	/**
 	 * A tree data provider which is used to populate the symbols tree.
 	 */
@@ -144,6 +141,5 @@ export interface SymbolItemEditorHighlights<T> {
 }
 
 export interface SymbolItemDragAndDrop<T> {
-
 	getDragUri(item: T): vscode.Uri | undefined;
 }

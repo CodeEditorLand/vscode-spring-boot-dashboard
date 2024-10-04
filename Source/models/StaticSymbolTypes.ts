@@ -4,47 +4,46 @@
 import * as lsp from "vscode-languageclient";
 
 export abstract class StaticSymbol {
-    constructor(protected raw: lsp.SymbolInformation) {
-    }
+	constructor(protected raw: lsp.SymbolInformation) {}
 
-    public get name() : string {
-        return this.raw.name;
-    }
+	public get name(): string {
+		return this.raw.name;
+	}
 
-    public get location() : lsp.Location {
-        return this.raw.location;
-    }
+	public get location(): lsp.Location {
+		return this.raw.location;
+	}
 
-    abstract label: string;
+	abstract label: string;
 }
 
-export class StaticBean extends StaticSymbol{
-    public get label(): string {
-        return this.id;
-    }
+export class StaticBean extends StaticSymbol {
+	public get label(): string {
+		return this.id;
+	}
 
-    public get id() : string {
-        const m = (this.raw.name as string).match(/^@\+ '(.+?)'/);
-        return m ? m[1] : "unknown";
-    }
+	public get id(): string {
+		const m = (this.raw.name as string).match(/^@\+ '(.+?)'/);
+		return m ? m[1] : "unknown";
+	}
 }
 
 export class StaticEndpoint extends StaticSymbol {
-    public pattern: string | undefined;
-    public method: string | undefined;
+	public pattern: string | undefined;
+	public method: string | undefined;
 
-    constructor(raw: lsp.SymbolInformation) {
-        super(raw);
-        const [pattern, method] = this.raw.name.replace(/^@/, "").split(" -- ");
-        this.pattern = pattern;
-        this.method = method;
-    }
+	constructor(raw: lsp.SymbolInformation) {
+		super(raw);
+		const [pattern, method] = this.raw.name.replace(/^@/, "").split(" -- ");
+		this.pattern = pattern;
+		this.method = method;
+	}
 
-    public get label() : string {
-        let label = this.pattern ?? "unknown";
-        if (this.method) {
-            label += ` [${this.method}]`;
-        }
-        return label;
-    }
+	public get label(): string {
+		let label = this.pattern ?? "unknown";
+		if (this.method) {
+			label += ` [${this.method}]`;
+		}
+		return label;
+	}
 }
