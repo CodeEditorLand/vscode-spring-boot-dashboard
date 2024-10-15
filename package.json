@@ -587,7 +587,7 @@
 	},
 	"dependencies": {
 		"@pivotal-tools/jvm-launch-utils": "0.0.23",
-		"chart.js": "4.4.4",
+		"chart.js": "4.4.5",
 		"chartjs": "0.3.24",
 		"chartjs-adapter-moment": "1.0.1",
 		"get-port": "7.1.0",
