@@ -24,11 +24,13 @@ export class PropertiesProvider implements vscode.TreeDataProvider<TreeData> {
 			item.description = element.value;
 			item.iconPath = new vscode.ThemeIcon("symbol-value");
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			return item;
 		} else if (element instanceof PropertyGroup) {
 			const item = new vscode.TreeItem(element.name);
 			item.iconPath = new vscode.ThemeIcon("symbol-namespace");
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+
 			return item;
 		} else {
 			throw new Error("Unsupported data type for tree item.");
@@ -38,9 +40,12 @@ export class PropertiesProvider implements vscode.TreeDataProvider<TreeData> {
 	async getChildren(element?: TreeData | undefined): Promise<TreeData[]> {
 		if (element === undefined) {
 			const keys = connectedProcessKeys();
+
 			const ret = [];
+
 			for (const k of keys) {
 				const lp = getLiveProcess(k);
+
 				if (lp) {
 					ret.push(lp);
 				}
@@ -48,6 +53,7 @@ export class PropertiesProvider implements vscode.TreeDataProvider<TreeData> {
 			return ret;
 		} else if (element instanceof LiveProcess) {
 			const pgs = await element.getProperties();
+
 			return pgs ?? [];
 		} else if (element instanceof PropertyGroup) {
 			return element.properties;

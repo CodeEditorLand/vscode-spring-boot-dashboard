@@ -62,6 +62,7 @@ export class RemoteAppManager {
 		options?: RemoteBootAppDataProviderOptions,
 	) {
 		let entry = this.registry.get(providerName);
+
 		if (entry) {
 			entry.addProvider(provider);
 			entry.updateOptions(options);
@@ -87,8 +88,11 @@ export class RemoteAppManager {
 
 	public async getRemoteApps(providerName: string) {
 		const entry = this.registry.get(providerName);
+
 		const providers = entry?.providers;
+
 		const ret = [];
+
 		if (providers) {
 			for (const p of providers) {
 				const apps = await p.provide();
@@ -97,11 +101,13 @@ export class RemoteAppManager {
 		}
 		// cache
 		this.apps.set(providerName, ret);
+
 		return ret;
 	}
 
 	public getAllRemoteApps() {
 		const ret = [];
+
 		for (const providerName of this.getProviderNames()) {
 			const apps = this.apps.get(providerName) ?? [];
 			ret.push(...apps);
@@ -122,6 +128,7 @@ export class RemoteAppManager {
 
 	public getRemoteAppByHost(host: string) {
 		const apps = this.getAllRemoteApps();
+
 		return apps.find((a) => a.host === host);
 	}
 }

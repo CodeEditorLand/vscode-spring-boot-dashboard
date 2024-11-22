@@ -12,6 +12,7 @@ import { asLocation } from "./utils";
 const DEFAULT_DIRECTION = BeansDirection.Dependencies;
 
 let currentBean: Bean;
+
 let currentDirection: BeansDirection = DEFAULT_DIRECTION;
 
 /**
@@ -47,14 +48,18 @@ export async function showBeanHierarchy(
 	const refViewletExt =
 		vscode.extensions.getExtension<SymbolTree>("vscode.references-view") ??
 		vscode.extensions.getExtension<SymbolTree>("ms-vscode.references-view");
+
 	const tree = await refViewletExt?.activate();
+
 	if (tree) {
 		const detail = await getBeanDetail(bean.processKey, bean.id);
+
 		if (detail?.length) {
 			// successful, update contextKey and cached direction etc.
 			currentBean = bean;
 			currentDirection =
 				direction ?? currentDirection ?? DEFAULT_DIRECTION;
+
 			const contextValue =
 				currentDirection === BeansDirection.Dependencies
 					? "dependencies"
@@ -67,8 +72,11 @@ export async function showBeanHierarchy(
 
 			// update tree
 			const beanWithDetail = { ...bean, ...detail[0] };
+
 			const uriString = await getUrlOfBeanType(beanWithDetail.type);
+
 			const location = asLocation(uriString);
+
 			const input = new BeansTreeInput(
 				location,
 				beanWithDetail,

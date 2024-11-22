@@ -27,6 +27,7 @@ export class LocalAppController {
 
 	public async runBootApps(debug?: boolean) {
 		const appList = this.getAppList();
+
 		if (appList.length === 1 && appList[0].state !== AppState.RUNNING) {
 			this.runBootApp(appList[0], debug);
 		} else {
@@ -42,6 +43,7 @@ export class LocalAppController {
 					placeHolder: `Select apps to ${debug ? "debug" : "run"}.`,
 				} /** options */,
 			);
+
 			if (appsToRun !== undefined) {
 				const appPaths = appsToRun.map((elem) => elem.path);
 				await Promise.all(
@@ -85,8 +87,10 @@ export class LocalAppController {
 				return null;
 			},
 		);
+
 		if (mainClasData === null) {
 			vscode.window.showWarningMessage("No main class is found.");
+
 			return;
 		}
 		if (mainClasData === undefined) {
@@ -94,6 +98,7 @@ export class LocalAppController {
 		}
 
 		let targetConfig = this._getLaunchConfig(mainClasData);
+
 		if (!targetConfig) {
 			targetConfig = await this._createNewLaunchConfig(mainClasData);
 		}
@@ -106,10 +111,12 @@ export class LocalAppController {
 		app.jmxPort = parseJMXPort(targetConfig.vmArgs);
 
 		const cwdUri: vscode.Uri = vscode.Uri.parse(app.path);
+
 		const launchConfig = Object.assign({}, targetConfig, {
 			noDebug: !debug,
 			cwd: cwdUri.fsPath,
 		});
+
 		if (profile) {
 			launchConfig.vmArgs =
 				launchConfig.vmArgs + ` -Dspring.profiles.active=${profile}`;
@@ -125,17 +132,24 @@ export class LocalAppController {
 		const sourceFolders = app.classpath.entries
 			.filter((cpe) => cpe.kind === "source")
 			.map((cpe) => cpe.path);
+
 		const profilePattern = /^application-(.*).(properties|yml|yaml)$/;
+
 		const detectedProfiles = [];
+
 		for (const sf of sourceFolders) {
 			try {
 				const uri = vscode.Uri.file(sf);
+
 				const entries = await vscode.workspace.fs.readDirectory(uri);
+
 				const files = entries.filter(
 					(f) => f[1] === vscode.FileType.File,
 				);
+
 				for (const f of files) {
 					const res = profilePattern.exec(f[0]);
+
 					if (res !== null) {
 						const matchedProfile = res[1];
 						detectedProfiles.push(matchedProfile);
@@ -155,6 +169,7 @@ export class LocalAppController {
 					"will add -Dspring.profiles.active=profile1,profile2... to VMArgs",
 			},
 		);
+
 		if (selectedProfiles !== undefined) {
 			const profileArgs = selectedProfiles.join(",");
 			await this.runBootApp(app, debug, profileArgs);
@@ -180,6 +195,7 @@ export class LocalAppController {
 
 		if (app) {
 			this.manager.bindDebugSession(app, session);
+
 			if (isActuatorOnClasspath(session.configuration)) {
 				// actuator enabled: wait live connection to update running state.
 				this._setState(app, AppState.LAUNCHING);
@@ -202,6 +218,7 @@ export class LocalAppController {
 
 	public async stopBootApps() {
 		const appList = this.getAppList();
+
 		if (appList.length === 1 && appList[0].state !== AppState.INACTIVE) {
 			this.stopBootApp(appList[0]);
 		} else {
@@ -217,6 +234,7 @@ export class LocalAppController {
 					placeHolder: "Select apps to stop.",
 				} /** options */,
 			);
+
 			if (appsToStop !== undefined) {
 				const appPaths = appsToStop.map((elem) => elem.path);
 				await Promise.all(
@@ -232,6 +250,7 @@ export class LocalAppController {
 		// TODO: How to send a shutdown signal to the app instead of killing the process directly?
 		const session: vscode.DebugSession | undefined =
 			this.manager.getSessionByApp(app);
+
 		if (session) {
 			if (isRunInTerminal(session) && app.pid) {
 				// kill corresponding process launched in terminal
@@ -251,6 +270,7 @@ export class LocalAppController {
 
 	public onDidStopBootApp(session: vscode.DebugSession): void {
 		const app = this.manager.getAppBySession(session);
+
 		if (app) {
 			this._setState(app, AppState.INACTIVE);
 		}
@@ -262,11 +282,13 @@ export class LocalAppController {
 		}
 
 		const jvm = await findJvm();
+
 		if (!jvm) {
 			return undefined;
 		}
 
 		const jmxurl = `service:jmx:rmi:///jndi/rmi://localhost:${app.jmxPort}/jmxrmi`;
+
 		const javaProcess = jvm.jarLaunch(
 			path.resolve(
 				this.context.extensionPath,
@@ -275,11 +297,13 @@ export class LocalAppController {
 			),
 			["-Djmxurl=" + jmxurl],
 		);
+
 		const stdout = javaProcess.stdout
 			? await readAll(javaProcess.stdout)
 			: null;
 
 		let port: number | undefined = undefined;
+
 		let contextPath: string | undefined = undefined;
 
 		READ_JMX_EXTENSION_RESPONSE: {
@@ -290,6 +314,7 @@ export class LocalAppController {
 					jmxExtensionResponse = JSON.parse(stdout);
 				} catch (ex) {
 					console.log(ex);
+
 					break READ_JMX_EXTENSION_RESPONSE;
 				}
 
@@ -326,6 +351,7 @@ export class LocalAppController {
 
 	public async openBootApp(app: BootApp): Promise<void> {
 		let openUrl: string | undefined;
+
 		if (app.contextPath !== undefined && app.port !== undefined) {
 			openUrl = constructOpenUrl(app.contextPath, app.port);
 		} else {
@@ -337,6 +363,7 @@ export class LocalAppController {
 				vscode.workspace
 					.getConfiguration("spring.dashboard")
 					.get("openWith") === "external";
+
 			const browserCommand: string = openWithExternalBrowser
 				? "vscode.open"
 				: "simpleBrowser.api.open";
@@ -371,8 +398,10 @@ export class LocalAppController {
 				"launch",
 				vscode.Uri.file(mainClasData.filePath),
 			);
+
 		const rawConfigs: vscode.DebugConfiguration[] =
 			launchConfigurations.configurations;
+
 		return rawConfigs.find(
 			(conf) =>
 				conf.type === "java" &&
@@ -384,7 +413,9 @@ export class LocalAppController {
 
 	private _constructLaunchConfigName(mainClass: string, projectName: string) {
 		const prefix = "Spring Boot-";
+
 		let name = prefix + mainClass.substr(mainClass.lastIndexOf(".") + 1);
+
 		if (projectName !== undefined) {
 			name += `<${projectName}>`;
 		}
@@ -407,11 +438,13 @@ export class LocalAppController {
 			args: "",
 			envFile: "${workspaceFolder}/.env",
 		};
+
 		const launchConfigurations: vscode.WorkspaceConfiguration =
 			vscode.workspace.getConfiguration(
 				"launch",
 				vscode.Uri.file(mainClasData.filePath),
 			);
+
 		const configs: vscode.DebugConfiguration[] =
 			launchConfigurations.configurations;
 		configs.push(newConfig);
@@ -420,17 +453,20 @@ export class LocalAppController {
 			configs,
 			vscode.ConfigurationTarget.WorkspaceFolder,
 		);
+
 		return newConfig;
 	}
 
 	private showActuatorGuideIfNecessary(app: BootApp) {
 		const command = "spring.promptToEnableActuator";
+
 		const key = "LastTimeSeenActuatorGuide";
 
 		const lastMonth = new Date();
 		lastMonth.setMonth(lastMonth.getMonth() - 1);
 
 		const lastTimeSeen: number = this.context.globalState.get(key) ?? 0;
+
 		if (new Date(lastTimeSeen) < lastMonth) {
 			this.context.globalState.update(key, Date.now());
 			vscode.commands.executeCommand(
@@ -519,10 +555,12 @@ async function resolveDebugConfigurationWithSubstitutedVariables(
 
 function parseJMXPort(vmArgs: string): number | undefined {
 	const matched = vmArgs.match(/-Dcom\.sun\.management\.jmxremote\.port=\d+/);
+
 	if (matched) {
 		const port = matched[0].substring(
 			"-Dcom.sun.management.jmxremote.port=".length,
 		);
+
 		return parseInt(port);
 	}
 	return undefined;

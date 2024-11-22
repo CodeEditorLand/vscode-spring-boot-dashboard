@@ -20,10 +20,12 @@ export async function initialize(): Promise<ExtensionAPI> {
 		const stsExt = vscode.extensions.getExtension<ExtensionAPI>(
 			"vmware.vscode-spring-boot",
 		);
+
 		if (!stsExt) {
 			throw new Error("Extension vmware.vscode-spring-boot not enabled.");
 		}
 		stsApi = await stsExt.activate();
+
 		return stsApi;
 	} else {
 		return stsApi;
@@ -39,6 +41,7 @@ export async function getBeansDependingOn(
 		endpoint: "beans",
 		dependingOn: beanName,
 	});
+
 	return beans;
 }
 
@@ -47,6 +50,7 @@ export async function getBeans(processKey: string) {
 		processKey: processKey,
 		endpoint: "beans",
 	});
+
 	return result;
 }
 
@@ -56,6 +60,7 @@ export async function getBeanDetail(processKey: string, beanName: string) {
 		endpoint: "beans",
 		beanName,
 	});
+
 	return bean;
 }
 
@@ -64,6 +69,7 @@ export async function getMappings(processKey: string) {
 		processKey: processKey,
 		endpoint: "mappings",
 	});
+
 	return result;
 }
 
@@ -105,6 +111,7 @@ export async function getPort(processKey: string) {
 		processKey: processKey,
 		endpoint: "port",
 	});
+
 	return result;
 }
 
@@ -113,6 +120,7 @@ export async function getContextPath(processKey: string) {
 		processKey: processKey,
 		endpoint: "contextPath",
 	});
+
 	return result;
 }
 
@@ -121,6 +129,7 @@ export async function getProperties(processKey: string) {
 		processKey: processKey,
 		endpoint: "properties",
 	});
+
 	return result;
 }
 
@@ -130,6 +139,7 @@ export async function getProperties(processKey: string) {
  */
 export async function getUrlOfBeanType(beanType: string) {
 	const bindingKey = `L${beanType.replace(/\./g, "/")};`;
+
 	const uriString = await vscode.commands.executeCommand<string>(
 		"java.execute.workspaceCommand",
 		"sts.java.javadocHoverLink",
@@ -138,6 +148,7 @@ export async function getUrlOfBeanType(beanType: string) {
 			lookInOtherProjects: true,
 		},
 	);
+
 	return uriString;
 }
 
@@ -150,8 +161,10 @@ export function getPid(processKey: string) {
 
 export async function getMainClass(processKey: string) {
 	const mainClass = processKey.split(" - ")?.[1];
+
 	if (!mainClass) {
 		const pid = getPid(processKey);
+
 		return await getMainClassFromPid(pid);
 	}
 	return mainClass;
@@ -160,15 +173,19 @@ export async function getMainClass(processKey: string) {
 async function getMainClassFromPid(pid: string) {
 	// workaround: parse output from  `jps -l`
 	const jreHome = await getJreHome();
+
 	if (jreHome) {
 		const jpsExecRes = await execFile(path.join(jreHome, "bin", "jps"), [
 			"-l",
 		]);
+
 		const targetLine = jpsExecRes.stdout
 			.split(os.EOL)
 			.find((line) => line.startsWith(pid));
+
 		if (targetLine) {
 			const segments = targetLine.trim().split(/\s+/);
+
 			return segments[segments.length - 1];
 		}
 	}
@@ -178,6 +195,7 @@ async function getMainClassFromPid(pid: string) {
 
 async function getJreHome() {
 	const javaExt = vscode.extensions.getExtension("redhat.java");
+
 	if (!javaExt) {
 		return undefined;
 	}
@@ -189,6 +207,7 @@ export async function requestWorkspaceSymbols(projectPath?: string): Promise<{
 	mappings: lsp.SymbolInformation[];
 }> {
 	let filter = "";
+
 	if (projectPath) {
 		const locationPrefix = vscode.Uri.file(
 			sanitizeFilePath(projectPath),
@@ -200,6 +219,7 @@ export async function requestWorkspaceSymbols(projectPath?: string): Promise<{
 			"workspace/symbol",
 			{ "query": `${filter}@+` },
 		)) ?? [];
+
 	const mappings =
 		(await stsApi?.client.sendRequest<lsp.SymbolInformation[]>(
 			"workspace/symbol",
@@ -220,6 +240,7 @@ export async function requestWorkspaceSymbolsByQuery(
 			"workspace/symbol",
 			{ "query": query },
 		)) ?? [];
+
 	return res;
 }
 

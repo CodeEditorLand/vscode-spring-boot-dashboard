@@ -7,10 +7,15 @@ import * as path from "path";
 import { ExtensionContext, extensions, Uri } from "vscode";
 
 let EXTENSION_CONTEXT: ExtensionContext;
+
 let EXTENSION_PUBLISHER: string;
+
 let EXTENSION_NAME: string;
+
 let EXTENSION_VERSION: string;
+
 let EXTENSION_AI_KEY: string;
+
 let TEMP_FOLDER_PER_USER: string;
 
 export async function loadPackageInfo(
@@ -22,6 +27,7 @@ export async function loadPackageInfo(
 		context.asAbsolutePath("./package.json"),
 		{ encoding: "utf-8" },
 	);
+
 	const { publisher, name, version, aiKey } = JSON.parse(raw);
 	EXTENSION_AI_KEY = aiKey;
 	EXTENSION_PUBLISHER = publisher;
@@ -52,6 +58,7 @@ export function getPathToTempFolder(...args: string[]): string {
 
 export function getPathToExtensionRoot(...args: string[]): string {
 	const ext = extensions.getExtension(getExtensionId());
+
 	if (!ext) {
 		throw new Error("Cannot identify extension root.");
 	}

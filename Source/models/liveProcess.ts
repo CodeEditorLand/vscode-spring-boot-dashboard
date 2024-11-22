@@ -16,6 +16,7 @@ export class LiveProcess {
 	constructor(private payload: sts.LiveProcessPayload) {
 		if (payload.type === "local") {
 			let app = dashboard.appsProvider.manager.getAppByPid(payload.pid);
+
 			if (!app) {
 				// fallback: here assume processName is full-qualified name of mainclass, which is not guaranteed.
 				const mainClass = payload.processName;
@@ -57,6 +58,7 @@ export class LiveProcess {
 
 	public toTreeItem(): vscode.TreeItem {
 		let item;
+
 		if (this.type === "local") {
 			item = new vscode.TreeItem(this.appName);
 			item.description = `pid: ${this.pid}`;
@@ -68,19 +70,24 @@ export class LiveProcess {
 		item.iconPath = BootAppItem.RUNNING_ICON(); // TODO: should use customized icon based on connection type
 		item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		item.contextValue = "liveProcess";
+
 		return item;
 	}
 
 	public async getProperties(): Promise<PropertyGroup[] | undefined> {
 		if (this.propertyGroups === undefined) {
 			const propertiesPayload = await getProperties(this.processKey);
+
 			const propertyGroups = [];
 
 			// PARSE
 			const { sources } = propertiesPayload;
+
 			for (const source of sources) {
 				const group = new PropertyGroup(source.sourceName);
+
 				const { properties } = source;
+
 				for (const prop of properties) {
 					const { property, value } = prop;
 					new Property(property, value, group);

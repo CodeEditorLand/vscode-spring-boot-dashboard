@@ -16,8 +16,10 @@ import { sleep } from "./utils";
 function isBootAppClasspath(cp: ClassPathData): boolean {
 	if (cp.entries) {
 		const entries = cp.entries;
+
 		for (let i = 0; i < entries.length; i++) {
 			const cpe = entries[i];
+
 			const filename = path.basename(cpe.path);
 
 			if (
@@ -36,6 +38,7 @@ export class LocalAppManager {
 	private _bindedSessions: Map<string, DebugSession> = new Map();
 	private _onDidChangeApps: vscode.EventEmitter<BootApp | undefined> =
 		new vscode.EventEmitter<BootApp | undefined>();
+
 	constructor() {
 		//We have to do something with the errors here because constructor cannot
 		// be declared as `async`.
@@ -62,6 +65,7 @@ export class LocalAppManager {
 		const location = Array.from(this._bindedSessions.keys()).find(
 			(key) => this._bindedSessions.get(key) === session,
 		);
+
 		if (location) {
 			return this._boot_projects.get(location);
 		} else {
@@ -88,6 +92,7 @@ export class LocalAppManager {
 
 	public getAppByPid(pid: number | string): BootApp | undefined {
 		const pidNumber = typeof pid === "number" ? pid : parseInt(pid);
+
 		return this.getAppList().find((app) => app.pid === pidNumber);
 	}
 
@@ -112,6 +117,7 @@ export class LocalAppManager {
 					if (entries && isBootAppClasspath(entries)) {
 						const current: BootApp | undefined =
 							this._boot_projects.get(location);
+
 						if (current) {
 							current.name = name;
 							current.classpath = entries;
@@ -141,10 +147,14 @@ export class LocalAppManager {
 
 		async function registerClasspathListener(): Promise<void> {
 			const MAX_RETRIES = 10;
+
 			const WAIT_IN_SECONDS = 2;
+
 			let available_tries = MAX_RETRIES;
+
 			while (available_tries > 0) {
 				available_tries--;
+
 				try {
 					const javaExtApi: ExtensionAPI = await vscode.extensions
 						.getExtension("redhat.java")
@@ -155,6 +165,7 @@ export class LocalAppManager {
 						"sts.java.addClasspathListener",
 						callbackId,
 					);
+
 					return;
 				} catch (error) {
 					if (available_tries > 0) {

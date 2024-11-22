@@ -9,6 +9,7 @@ import pidtree = require("pidtree");
 
 export function readAll(input: Readable): Promise<string> {
 	let buffer = "";
+
 	return new Promise<string>((resolve, reject) => {
 		input.on("data", (data) => {
 			buffer += data;
@@ -28,6 +29,7 @@ export async function isAlive(pid?: number) {
 	}
 
 	const pidList = await pidtree(-1);
+
 	return pidList.includes(pid);
 }
 
@@ -41,6 +43,7 @@ export async function sleep(ms: number) {
 
 export function isActuatorJarFile(f: string): boolean {
 	const fileName = path.basename(f || "");
+
 	if (/^spring-boot-actuator-\d+\.\d+\.\d+(.*)?.jar$/.test(fileName)) {
 		return true;
 	}
@@ -65,8 +68,11 @@ export function constructOpenUrl(
 	const configOpenUrl: string | undefined = vscode.workspace
 		.getConfiguration("spring.dashboard")
 		.get<string>("openUrl");
+
 	let openUrl: string;
+
 	const port = Number(portString);
+
 	if (configOpenUrl === undefined) {
 		openUrl = `http${port === 443 ? "s" : ""}://${hostname ?? "localhost"}:${port}${contextPath}`;
 	} else {

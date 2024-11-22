@@ -113,16 +113,19 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 			"dist",
 			"toolkit.js",
 		]);
+
 		const mainUri = getUri(webview, extensionUri, [
 			"resources",
 			"webview-ui",
 			"main.js",
 		]);
+
 		const stylesUri = getUri(webview, extensionUri, [
 			"resources",
 			"webview-ui",
 			"styles.css",
 		]);
+
 		const chartLibPath = getUri(webview, extensionUri, [
 			"dist",
 			"memoryViewAssets",
@@ -130,12 +133,14 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 			"dist",
 			"chart.min.js",
 		]);
+
 		const chartjsPath = getUri(webview, extensionUri, [
 			"dist",
 			"memoryViewAssets",
 			"chartjs",
 			"chart.js",
 		]);
+
 		const chartjsAdapterPath = getUri(webview, extensionUri, [
 			"dist",
 			"memoryViewAssets",
@@ -143,6 +148,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 			"dist",
 			"chartjs-adapter-moment.min.js",
 		]);
+
 		const chartjsAdapterScipt = getUri(webview, extensionUri, [
 			"dist",
 			"memoryViewAssets",
@@ -150,6 +156,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 			"dist",
 			"chartjs-adapter-moment.js",
 		]);
+
 		const momentLibPath = getUri(webview, extensionUri, [
 			"dist",
 			"memoryViewAssets",
@@ -209,7 +216,9 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 	private _setWebviewMessageListener(webviewView: vscode.WebviewView) {
 		webviewView.webview.onDidReceiveMessage(async (message) => {
 			const command = message.command;
+
 			let processKey = message.processKey;
+
 			switch (command) {
 				case "LoadMetrics":
 					if (processKey !== "" && processKey !== undefined) {
@@ -217,14 +226,18 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 						await refreshMetrics(processKey, "gcPauses");
 					}
 					break;
+
 				case "LoadProcess":
 					this.addLiveProcesses(
 						Array.from(this.storeLiveProcesses.values()),
 					);
 					this.updateSettings();
+
 					break;
+
 				case "FetchData": {
 					const type = message.type;
+
 					if (processKey === "") {
 						processKey = this.storeLiveProcesses.values().next()
 							.value.liveProcess?.processKey;
@@ -331,6 +344,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 	private removeLiveProcess(process: LiveProcess) {
 		if (this.storeLiveProcesses.get(process.processKey)) {
 			this.storeLiveProcesses.delete(process.processKey);
+
 			if (this._view) {
 				this._view.webview.postMessage({
 					command: "removeProcess",
@@ -347,6 +361,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 	 */
 	private rotateMetrics(metrics: Metrics[][], latestMetrics: Metrics[]) {
 		metrics.push(latestMetrics);
+
 		while (metrics.length > this.maxDataPoints) {
 			metrics.shift();
 		}
@@ -368,16 +383,23 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 		metricsRaw: unknown,
 	) {
 		let store;
+
 		switch (category) {
 			case "heap":
 				store = this.storeHeapMemoryMetrics;
+
 				break;
+
 			case "non-heap":
 				store = this.storeNonHeapMemoryMetrics;
+
 				break;
+
 			case "gc-pauses":
 				store = this.storeGcPausesMetrics;
+
 				break;
+
 			default:
 		}
 		if (!store) {
@@ -389,6 +411,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 			const targetLiveProcess = Array.from(store.keys()).find(
 				(lp) => lp.processKey === liveProcess.processKey,
 			);
+
 			if (targetLiveProcess) {
 				store.delete(targetLiveProcess);
 				this.removeLiveProcess(targetLiveProcess);
@@ -400,6 +423,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 					Array.from(store.keys()).find(
 						(lp) => lp.processKey === liveProcess.processKey,
 					) ?? new LiveProcess(liveProcess);
+
 				if (!store.has(targetLiveProcess)) {
 					this.addLiveProcess(targetLiveProcess);
 					store.set(targetLiveProcess, []);
@@ -409,8 +433,10 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 				const targetLiveProcess = Array.from(store.keys()).find(
 					(lp) => lp.processKey === liveProcess.processKey,
 				);
+
 				if (targetLiveProcess) {
 					const metrics = store.get(targetLiveProcess);
+
 					if (metrics !== undefined) {
 						const latestMetrics = metricsRaw.map((raw) =>
 							parseMetrticsData(liveProcess.processKey, raw),
@@ -427,11 +453,17 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 
 function parseMetrticsData(processKey: string, raw: any): Metrics {
 	const label = raw.name;
+
 	const description = raw.description;
+
 	const baseUnit = raw.baseUnit;
+
 	const measurements = raw.measurements;
+
 	const availableTags = raw.availableTags;
+
 	const time = timestamp();
+
 	return {
 		processKey,
 		time,
@@ -446,7 +478,9 @@ function parseMetrticsData(processKey: string, raw: any): Metrics {
 
 function timestamp() {
 	const date = new Date().toTimeString();
+
 	const chop = date.indexOf(" ");
+
 	return date.substring(0, chop);
 }
 

@@ -25,6 +25,7 @@ export function locationEquals(
 	}
 
 	const la = protocol2CodeConverter().asLocation(la_lsp);
+
 	return (
 		la.uri.toString() === lb.uri.toString() &&
 		rangeEquals(la.range, lb.range)

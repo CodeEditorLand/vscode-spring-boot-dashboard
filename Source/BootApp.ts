@@ -105,6 +105,7 @@ export class BootApp {
 
 	public set pid(pid: number | undefined) {
 		this._pid = pid;
+
 		if (pid !== undefined) {
 			this.setWatchdog();
 		}
@@ -153,6 +154,7 @@ export class BootApp {
 	public setWatchdog() {
 		const watchdog: NodeJS.Timeout = setInterval(async () => {
 			const alive = await isAlive(this.pid);
+
 			if (!alive) {
 				clearInterval(watchdog);
 				this.reset();
@@ -176,6 +178,7 @@ export class BootApp {
 				"vscode.java.resolveMainClass",
 				this.path,
 			);
+
 			if (mainClassList && mainClassList instanceof Array) {
 				this.mainClasses = mainClassList;
 			} else {

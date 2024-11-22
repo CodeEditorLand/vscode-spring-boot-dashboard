@@ -13,6 +13,7 @@ export class Property {
 
 export class PropertyGroup {
 	public properties: Property[];
+
 	constructor(public name: string) {
 		this.properties = [];
 	}

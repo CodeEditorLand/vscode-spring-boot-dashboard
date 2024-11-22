@@ -65,6 +65,7 @@ export function getLiveProcess(processKey: string): LiveProcess | undefined {
 
 async function updateProcessInfo(payload: string | LiveProcessPayload) {
 	const liveProcess = await parsePayload(payload);
+
 	const { processKey, type } = liveProcess;
 
 	const beans = await getBeans(processKey);
@@ -74,8 +75,11 @@ async function updateProcessInfo(payload: string | LiveProcessPayload) {
 	dashboard.mappingsProvider.refreshLive(liveProcess, mappings);
 
 	const port = await getPort(processKey);
+
 	const activeProfiles = await getActiveProfiles(processKey);
+
 	const contextPath = await getContextPath(processKey);
+
 	const lp = new LiveProcess(liveProcess);
 	store.data.set(processKey, lp);
 
@@ -83,6 +87,7 @@ async function updateProcessInfo(payload: string | LiveProcessPayload) {
 		const runningApp = dashboard.appsProvider.manager.getAppByPid(
 			liveProcess.pid,
 		);
+
 		if (runningApp) {
 			runningApp.port = parseInt(port);
 			runningApp.activeProfiles = activeProfiles;
@@ -120,9 +125,11 @@ async function updateProcessGcPausesMetrics(
 	payload: string | LiveProcessPayload,
 ) {
 	const liveProcess = await parsePayload(payload);
+
 	const { processKey } = liveProcess;
 
 	const gcPauses = await getGcPausesMetrics(processKey);
+
 	if (gcPauses) {
 		dashboard.memoryViewProvider.refreshLiveMetrics(
 			liveProcess,
@@ -136,9 +143,11 @@ async function updateProcessMemoryMetrics(
 	payload: string | LiveProcessPayload,
 ) {
 	const liveProcess = await parsePayload(payload);
+
 	const { processKey } = liveProcess;
 
 	const heapMemMetrics = await getMemoryMetrics(processKey, "heapMemory");
+
 	const nonHeapMemMetrics = await getMemoryMetrics(
 		processKey,
 		"nonHeapMemory",
@@ -192,6 +201,7 @@ async function resetProcessInfo(payload: string | LiveProcessPayload) {
 		"spring:hasLiveProcess",
 		store.data.size > 0,
 	);
+
 	if (liveProcess.type === "local") {
 		const disconnectedApp = dashboard.appsProvider.manager.getAppByPid(
 			liveProcess.pid,
@@ -218,8 +228,11 @@ async function parsePayload(
 ): Promise<LiveProcessPayload> {
 	if (typeof payload === "string") {
 		const processKey = payload;
+
 		const processName = await getMainClass(processKey);
+
 		const pid = getPid(processKey);
+
 		return {
 			type: "local",
 			processKey,

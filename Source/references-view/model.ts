@@ -30,7 +30,9 @@ export class BeansTreeInput implements SymbolTreeInput<BeanItem> {
 
 	async resolve(): Promise<BeansModel> {
 		const items: Bean[] = [this.rootItem];
+
 		const model = new BeansModel(this.direction, items);
+
 		return model;
 	}
 
@@ -84,6 +86,7 @@ class BeansModel implements SymbolTreeModel<BeanItem> {
 
 class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 	// onDidChangeTreeData?: vscode.Event<void | BeanItem | null | undefined> | undefined;
+
 	constructor(readonly model: BeansModel) {}
 
 	public getTreeItem(element: BeanItem): vscode.TreeItem {
@@ -91,6 +94,7 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 		item.collapsibleState = element.parent
 			? vscode.TreeItemCollapsibleState.Collapsed
 			: vscode.TreeItemCollapsibleState.Expanded;
+
 		const themeColor = new vscode.ThemeColor("charts.green");
 		item.iconPath = new vscode.ThemeIcon("spring-bean", themeColor);
 		item.contextValue = "spring:bean";
@@ -99,6 +103,7 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 			title: "Open",
 			arguments: [element.item],
 		};
+
 		return item;
 	}
 
@@ -110,6 +115,7 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 		}
 
 		const children: Bean[] = [];
+
 		if (this.model.direction === BeansDirection.Dependencies) {
 			// Dependencies
 			if (element.item.dependencies?.length) {
@@ -118,6 +124,7 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 						element.item.processKey,
 						dep,
 					);
+
 					if (details?.length) {
 						children.push({
 							...details[0],
@@ -137,6 +144,7 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 				element.item.processKey,
 				element.item.id,
 			);
+
 			if (beans?.length) {
 				for (const b of beans) {
 					children.push({
@@ -150,6 +158,7 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 		element.children = children.map(
 			(child) => new BeanItem(this.model, child, element.item, undefined),
 		);
+
 		return element.children;
 	}
 }

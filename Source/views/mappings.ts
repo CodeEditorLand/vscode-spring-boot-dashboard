@@ -38,6 +38,7 @@ export class Endpoint {
 
 	get label(): string {
 		let label = this.pattern ?? this.predicate ?? "unknown";
+
 		if (this.method) {
 			label += ` [${this.method}]`;
 		}
@@ -102,17 +103,21 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 
 			item.contextValue = `bootApp+${element.state}`;
+
 			if (!element.isActuatorOnClasspath) {
 				item.contextValue += "+noActuator";
 			}
 			return item;
 		} else {
 			const isLive = !!(element as Endpoint).processKey;
+
 			const label = element.label;
+
 			const item = new vscode.TreeItem(label);
 
 			item.tooltip = (element as Endpoint).handler;
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 			const themeColor = isLive
 				? new vscode.ThemeColor("charts.green")
 				: undefined;
@@ -121,6 +126,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			item.contextValue = isLive
 				? "spring:endpoint"
 				: "spring:staticEndpoint";
+
 			if (element.method) {
 				item.contextValue += `+${element.method}`;
 			}
@@ -143,6 +149,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 		// top-level
 		if (!element) {
 			const ret = [];
+
 			const liveProcesses = Array.from(this.store.keys());
 			ret.push(...liveProcesses);
 			// update context key
@@ -156,6 +163,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			await initSymbols(5000);
 
 			const staticApps = Array.from(this.staticData.keys());
+
 			const appsWithoutLiveProcess = staticApps.filter(
 				(app) => !liveProcesses.find((lp) => lp.appName === app.name),
 			);
@@ -167,6 +175,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 					(b as LiveProcess).appName ?? (b as BootApp).name,
 				),
 			);
+
 			return ret;
 		}
 
@@ -178,9 +187,12 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const correspondingApp = Array.from(this.staticData.keys()).find(
 				(app) => app.name === element.appName,
 			);
+
 			const fullList = liveMappings;
+
 			if (correspondingApp) {
 				const staticMappings = this.staticData.get(correspondingApp);
+
 				if (staticMappings?.length) {
 					liveMappings?.forEach(
 						(lm) =>
@@ -230,6 +242,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const targetLiveProcess = Array.from(this.store.keys()).find(
 				(lp) => lp.processKey === liveProcess.processKey,
 			);
+
 			if (targetLiveProcess) {
 				this.store.delete(targetLiveProcess);
 			}
@@ -239,6 +252,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 				Array.from(this.store.keys()).find(
 					(lp) => lp.processKey === liveProcess.processKey,
 				) ?? new LiveProcess(liveProcess);
+
 			const mappings = mappingsRaw
 				.map(
 					(raw) => new Endpoint(liveProcess.processKey, raw.data.map),
@@ -267,19 +281,23 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 		// search store for live mappings
 		for (const lp of this.store.keys()) {
 			const mappings = this.store.get(lp);
+
 			const found = mappings
 				?.filter((m) => m.corresponding)
 				.find((sm) =>
 					locationEquals(sm.corresponding?.location, location),
 				);
+
 			return found;
 		}
 		// fallback to check static beans
 		for (const app of this.staticData.keys()) {
 			const staticBeans = this.staticData.get(app);
+
 			const found = staticBeans?.find((sb) =>
 				locationEquals(sb.location, location),
 			);
+
 			return found;
 		}
 
@@ -289,11 +307,15 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 
 export async function openEndpointHandler(endpoint: Endpoint) {
 	const port = await getPort(endpoint.processKey);
+
 	const contextPath = (await getContextPath(endpoint.processKey)) ?? "";
+
 	let hostname;
+
 	if (endpoint.liveProcess?.type === "remote") {
 		// TODO: should request upstream API for valid hostname
 		const jmxurl = endpoint.liveProcess.remoteApp?.jmxurl;
+
 		if (jmxurl) {
 			hostname = vscode.Uri.parse(jmxurl).authority;
 		}
@@ -308,7 +330,9 @@ export async function openEndpointHandler(endpoint: Endpoint) {
 	// promp to fill {variables}
 	if (url?.match(/\{.*\}/)) {
 		const start = url.indexOf("{");
+
 		const end = url.indexOf("}", start) + 1;
+
 		const templateVariable = url.slice(start, end);
 		url = await vscode.window.showInputBox({
 			value: url,
@@ -325,9 +349,11 @@ export async function openEndpointHandler(endpoint: Endpoint) {
 			vscode.workspace
 				.getConfiguration("spring.dashboard")
 				.get("openWith") === "external";
+
 		const browserCommand: string = openWithExternalBrowser
 			? "vscode.open"
 			: "simpleBrowser.api.open";
+
 		let uri = vscode.Uri.parse(url);
 		uri = await vscode.env.asExternalUri(uri); // Enables Remote envs like Codespaces
 		vscode.commands.executeCommand(browserCommand, uri);

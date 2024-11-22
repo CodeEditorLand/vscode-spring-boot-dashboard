@@ -14,6 +14,7 @@ import {
 } from "./stsApi";
 
 let beans: lsp.SymbolInformation[];
+
 let mappings: lsp.SymbolInformation[];
 
 const MAX_TIMEOUT = 20 * 60 * 1000; // 20 min
@@ -21,7 +22,9 @@ const MAX_TIMEOUT = 20 * 60 * 1000; // 20 min
 export async function init(timeout?: number) {
 	const INTERVAL = 1000; // 1000 ms
 	const TIMEOUT = timeout ?? MAX_TIMEOUT;
+
 	let retry = 0;
+
 	do {
 		const symbols = await requestWorkspaceSymbols();
 		beans = symbols.beans;
@@ -32,6 +35,7 @@ export async function init(timeout?: number) {
 		}
 		retry++;
 	} while (!beans?.length && !mappings?.length && retry * INTERVAL < TIMEOUT);
+
 	if (retry * INTERVAL >= TIMEOUT) {
 		console.warn(`Timed out: requestWorkspaceSymbols. (${TIMEOUT}ms)`);
 	}
@@ -43,6 +47,7 @@ export function getBeans(projectPath?: string | vscode.Uri) {
 	}
 
 	const path = sanitizeFilePath(projectPath);
+
 	return beans?.filter((b) =>
 		sanitizeFilePath(b.location.uri).startsWith(path),
 	);
@@ -54,6 +59,7 @@ export function getMappings(projectPath?: string | vscode.Uri) {
 	}
 
 	const path = sanitizeFilePath(projectPath);
+
 	return mappings?.filter((b) =>
 		sanitizeFilePath(b.location.uri).startsWith(path),
 	);
@@ -63,6 +69,7 @@ export async function navigateToLocation(
 	symbol: StaticEndpoint | StaticBean | Endpoint,
 ) {
 	let location;
+
 	if (symbol instanceof StaticBean || symbol instanceof StaticEndpoint) {
 		location = symbol.location;
 	} else if (symbol.corresponding) {
@@ -70,8 +77,10 @@ export async function navigateToLocation(
 	} else {
 		const query = `@${symbol.pattern} -- ${symbol.method}`; // workaround to query symbols
 		const symbols = await requestWorkspaceSymbolsByQuery(query);
+
 		if (symbols.length > 0) {
 			const exactMatched = symbols.find((s) => query === s.name);
+
 			if (exactMatched) {
 				location = exactMatched.location;
 			} else {

@@ -15,11 +15,15 @@ export function init(context: vscode.ExtensionContext) {
 			"spring.promptToEnableActuator",
 			async (app: BootApp, asNotification?: boolean) => {
 				const OPTION_ENABLE_ACTUATOR = "Enable Actuator";
+
 				const OPTION_LEARN_MORE = "Learn More";
+
 				const MESSAGE =
 					"Spring Boot Actuator is required to fetch live information";
+
 				const DETAILED_MESSAGE =
 					"To enable it, spring-boot-actuator-starter will be added to your project's pom.xml or build.gradle file.";
+
 				const option = await vscode.window.showInformationMessage(
 					MESSAGE,
 					{
@@ -29,6 +33,7 @@ export function init(context: vscode.ExtensionContext) {
 					OPTION_ENABLE_ACTUATOR,
 					OPTION_LEARN_MORE,
 				);
+
 				if (option === OPTION_ENABLE_ACTUATOR) {
 					await vscode.commands.executeCommand(
 						"spring.enableActuator",
@@ -45,11 +50,13 @@ export function init(context: vscode.ExtensionContext) {
 				const mavenExt = vscode.extensions.getExtension(
 					"vscjava.vscode-maven",
 				);
+
 				if (mavenExt?.isActive) {
 					const pomUri = vscode.Uri.joinPath(
 						vscode.Uri.parse(app.path),
 						"/pom.xml",
 					);
+
 					try {
 						await vscode.workspace.fs.readFile(pomUri);
 						await vscode.commands.executeCommand(
@@ -60,12 +67,15 @@ export function init(context: vscode.ExtensionContext) {
 								artifactId: "spring-boot-starter-actuator",
 							},
 						);
+
 						const OPTION_CONFIRM = "Save and Re-Run";
+
 						const choice =
 							await vscode.window.showInformationMessage(
 								"Spring Boot Actuator has been added to pom.xml. Please save and re-run your application for live information.",
 								OPTION_CONFIRM,
 							);
+
 						if (choice === OPTION_CONFIRM) {
 							// stop current ruuning app
 							await vscode.commands.executeCommand(

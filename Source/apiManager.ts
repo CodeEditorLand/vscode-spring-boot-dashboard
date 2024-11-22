@@ -7,6 +7,7 @@ import { connectRemoteApp, disconnectRemoteApp } from "./RemoteAppManager";
 
 export class ApiManager {
 	private api: ExtensionAPI;
+
 	constructor() {
 		this.api = {
 			registerRemoteBootAppDataProvider(providerName, provider, options) {

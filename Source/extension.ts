@@ -62,8 +62,11 @@ export async function initializeExtension(
 	context: vscode.ExtensionContext,
 ) {
 	dashboard.context = context;
+
 	const localAppManager = new LocalAppManager();
+
 	const remoteAppManager = new RemoteAppManager();
+
 	const appsProvider = new AppDataProvider(
 		localAppManager,
 		remoteAppManager,
@@ -148,6 +151,7 @@ export async function initializeExtension(
 				.find(
 					(app) => app.name === e.session.configuration.projectName,
 				);
+
 			if (app) {
 				app.pid = parseInt(e.body.processId);
 			}
@@ -157,6 +161,7 @@ export async function initializeExtension(
 	// live data
 	const beansProvider = new BeansDataProvider();
 	dashboard.beansProvider = beansProvider;
+
 	const beansView = vscode.window.createTreeView("spring.beans", {
 		treeDataProvider: beansProvider,
 		showCollapseAll: true,
@@ -166,6 +171,7 @@ export async function initializeExtension(
 		instrumentOperationAsVsCodeCommand("spring.beans.reveal", (element) => {
 			// find and focus on specific element if possible.
 			const item = beansProvider.getBeanBySymbol(element?.raw);
+
 			if (item) {
 				beansView.reveal(item, {
 					focus: true,
@@ -179,6 +185,7 @@ export async function initializeExtension(
 
 	const mappingsProvider = new MappingsDataProvider();
 	dashboard.mappingsProvider = mappingsProvider;
+
 	const mappingsView = vscode.window.createTreeView("spring.mappings", {
 		treeDataProvider: mappingsProvider,
 		showCollapseAll: true,
@@ -190,6 +197,7 @@ export async function initializeExtension(
 			(element) => {
 				// find and focus on specific element if possible.
 				const item = mappingsProvider.getMappingBySymbol(element?.raw);
+
 				if (item) {
 					mappingsView.reveal(item, {
 						focus: true,
@@ -201,6 +209,7 @@ export async function initializeExtension(
 			},
 		),
 	);
+
 	for (const viewId of [
 		"spring.beans",
 		"spring.mappings",
@@ -295,6 +304,7 @@ export async function initializeExtension(
 				const targetApp = controller
 					.getAppList()
 					.find((app) => app.path === appPath);
+
 				if (targetApp) {
 					await controller.runBootApp(targetApp);
 				}
@@ -307,6 +317,7 @@ export async function initializeExtension(
 		const gutterOption = vscode.workspace
 			.getConfiguration("spring.dashboard")
 			.get("enableGutter");
+
 		if (
 			(gutterOption === "auto" && vscode.version.includes("insider")) ||
 			gutterOption === "on"
@@ -317,6 +328,7 @@ export async function initializeExtension(
 			return false;
 		}
 	};
+
 	if (gutterEnabled()) {
 		initGutter(context);
 	}
@@ -380,6 +392,7 @@ export async function initializeExtension(
 	);
 
 	const apiManager = new ApiManager();
+
 	return apiManager.getApiInstance();
 }
 

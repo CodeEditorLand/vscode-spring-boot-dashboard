@@ -24,6 +24,7 @@ export class StaticBean extends StaticSymbol {
 
 	public get id(): string {
 		const m = (this.raw.name as string).match(/^@\+ '(.+?)'/);
+
 		return m ? m[1] : "unknown";
 	}
 }
@@ -34,6 +35,7 @@ export class StaticEndpoint extends StaticSymbol {
 
 	constructor(raw: lsp.SymbolInformation) {
 		super(raw);
+
 		const [pattern, method] = this.raw.name.replace(/^@/, "").split(" -- ");
 		this.pattern = pattern;
 		this.method = method;
@@ -41,6 +43,7 @@ export class StaticEndpoint extends StaticSymbol {
 
 	public get label(): string {
 		let label = this.pattern ?? "unknown";
+
 		if (this.method) {
 			label += ` [${this.method}]`;
 		}

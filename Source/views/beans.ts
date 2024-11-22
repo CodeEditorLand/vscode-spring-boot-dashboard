@@ -39,6 +39,7 @@ class BeanProperty {
 }
 
 type TreeData = Bean | LiveProcess | StaticBean | BootApp | BeanProperty;
+
 const COLOR_LIVE = new vscode.ThemeColor("charts.green");
 
 export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
@@ -83,6 +84,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 
 			item.contextValue = `bootApp+${element.state}`;
+
 			if (!element.isActuatorOnClasspath) {
 				item.contextValue += "+noActuator";
 			}
@@ -90,13 +92,16 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 		} else if (element instanceof BeanProperty) {
 			const item = new vscode.TreeItem(element.toString());
 			item.iconPath = new vscode.ThemeIcon("note", COLOR_LIVE);
+
 			return item;
 		} else if (element instanceof Bean) {
 			const label = element.id;
+
 			const item = new vscode.TreeItem(label);
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
 			item.iconPath = new vscode.ThemeIcon("spring-bean", COLOR_LIVE);
 			item.contextValue = "spring:bean";
+
 			const commandOnClick = "spring.dashboard.bean.open";
 			item.command = {
 				command: commandOnClick,
@@ -105,11 +110,13 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 			};
 
 			const desc = [];
+
 			if (!element.scope) {
 				const details = await getBeanDetail(
 					element.processKey,
 					element.id,
 				);
+
 				if (details?.length) {
 					element = { ...element, ...details[0] } as Bean;
 				}
@@ -122,14 +129,17 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 				desc.push("defined");
 			}
 			item.description = desc.join(", ");
+
 			return item;
 		} else if (element instanceof StaticBean) {
 			const label = element.label;
+
 			const item = new vscode.TreeItem(label);
 
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
 			item.iconPath = new vscode.ThemeIcon("spring-bean");
 			item.contextValue = "spring:staticBean";
+
 			const commandOnClick = "spring.dashboard.bean.navigate";
 
 			item.command = {
@@ -137,6 +147,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 				title: "Open",
 				arguments: [element],
 			};
+
 			return item;
 		} else {
 			throw new Error("Unsupported Tree Data Item");
@@ -147,6 +158,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 		// top-level
 		if (!element) {
 			const ret = [];
+
 			const liveProcesses = Array.from(this.store.keys());
 			ret.push(...liveProcesses);
 			// update context key
@@ -160,6 +172,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 			await initSymbols(5000);
 
 			const staticApps = Array.from(this.staticData.keys());
+
 			const appsWithoutLiveProcess = staticApps.filter(
 				(app) => !liveProcesses.find((lp) => lp.appName === app.name),
 			);
@@ -171,6 +184,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 					(b as LiveProcess).appName ?? (b as BootApp).name,
 				),
 			);
+
 			return ret;
 		}
 
@@ -183,12 +197,15 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const correspondingApp = Array.from(this.staticData.keys()).find(
 				(app) => app.name === element.appName,
 			);
+
 			if (correspondingApp) {
 				const staticBeans = this.staticData.get(correspondingApp);
+
 				if (staticBeans?.length) {
 					const definedBeans = liveBeans?.filter((lb) =>
 						staticBeans?.find((sb) => sb.id === lb.id),
 					);
+
 					if (definedBeans) {
 						for (const bean of definedBeans) {
 							bean.defined = true;
@@ -237,6 +254,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const targetLiveProcess = Array.from(this.store.keys()).find(
 				(lp) => lp.processKey === liveProcess.processKey,
 			);
+
 			if (targetLiveProcess) {
 				this.store.delete(targetLiveProcess);
 			}
@@ -246,6 +264,7 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 				Array.from(this.store.keys()).find(
 					(lp) => lp.processKey === liveProcess.processKey,
 				) ?? new LiveProcess(liveProcess);
+
 			const beans = beanIds
 				.map((b) => new Bean(liveProcess.processKey, b))
 				.sort((a, b) => a.id.localeCompare(b.id));
@@ -273,18 +292,23 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 		// search store for live beans
 		for (const lp of this.store.keys()) {
 			const beans = this.store.get(lp);
+
 			const correspondingApp = Array.from(this.staticData.keys()).find(
 				(app) => app.name === lp.appName,
 			);
+
 			if (correspondingApp) {
 				const staticBeans = this.staticData.get(correspondingApp);
+
 				const found = staticBeans?.find((sb) =>
 					locationEquals(sb.location, location),
 				);
+
 				if (found) {
 					const correspondingBean = beans?.find(
 						(b) => b.id === found.id,
 					);
+
 					return correspondingBean;
 				}
 			}
@@ -292,9 +316,11 @@ export class BeansDataProvider implements vscode.TreeDataProvider<TreeData> {
 		// fallback to check static beans
 		for (const app of this.staticData.keys()) {
 			const staticBeans = this.staticData.get(app);
+
 			const found = staticBeans?.find((sb) =>
 				locationEquals(sb.location, location),
 			);
+
 			return found;
 		}
 
@@ -306,6 +332,7 @@ export async function openBeanHandler(bean: Bean) {
 	// TODO: extract logic in sts.java.javadocHoverLink into jdtls as a utility
 	if (!bean.type) {
 		const details = await getBeanDetail(bean.processKey, bean.id);
+
 		if (details && details.length > 0) {
 			bean = { ...bean, ...details[0] };
 		}
@@ -313,8 +340,11 @@ export async function openBeanHandler(bean: Bean) {
 
 	if (bean.type) {
 		const rawUriString = await getUrlOfBeanType(bean.type);
+
 		const [uriString, line] = rawUriString.split("#");
+
 		let range;
+
 		if (line && line.match(/^[0-9]+$/)) {
 			range = new vscode.Range(Number(line), 0, Number(line), 0);
 		}

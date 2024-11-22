@@ -45,6 +45,7 @@ export class BootAppItem implements vscode.TreeItem {
 
 	public get description(): string | undefined {
 		const list = [];
+
 		if (this._app.port) {
 			list.push(`:${this._app.port}`);
 		}
@@ -68,8 +69,10 @@ export class BootAppItem implements vscode.TreeItem {
 		switch (this.state) {
 			case "running":
 				return BootAppItem.RUNNING_ICON();
+
 			case "launching":
 				return new vscode.ThemeIcon("sync~spin");
+
 			default:
 				return BootAppItem.STOPPED_ICON();
 		}

@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 export function del<T>(array: T[], e: T): void {
 	const idx = array.indexOf(e);
+
 	if (idx >= 0) {
 		array.splice(idx, 1);
 	}
@@ -28,9 +29,11 @@ export function asResourceUrl(
  */
 export function asLocation(urlLink: string): vscode.Location {
 	const [uriString, line] = urlLink.split("#");
+
 	const uri = vscode.Uri.parse(uriString);
 
 	const start = new vscode.Position(parseInt(line) - 1, 0);
+
 	const end = start.with(start.line + 1);
 
 	return new vscode.Location(uri, new vscode.Range(start, end));
@@ -70,5 +73,6 @@ export function getThemeIcon(
 	kind: vscode.SymbolKind,
 ): vscode.ThemeIcon | undefined {
 	const id = _themeIconIds[kind];
+
 	return id ? new vscode.ThemeIcon(id) : undefined;
 }

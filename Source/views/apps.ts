@@ -53,12 +53,14 @@ export class AppDataProvider implements vscode.TreeDataProvider<TreeData> {
 				vscode.ThemeIcon.Folder;
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 			item.contextValue = `spring:remoteAppProvider+${element}`;
+
 			return item;
 		} else {
 			// remote apps
 			const item = new vscode.TreeItem(element.name);
 			item.iconPath = element.iconPath ?? new vscode.ThemeIcon("project");
 			item.contextValue = "spring:remoteApp";
+
 			if (element.group) {
 				item.contextValue += `+${element.group}`;
 			}
@@ -72,6 +74,7 @@ export class AppDataProvider implements vscode.TreeDataProvider<TreeData> {
 	async getChildren(element?: TreeData | undefined): Promise<TreeData[]> {
 		if (!element) {
 			const providers = this.remoteAppManager.getProviderNames();
+
 			if (providers.length > 0) {
 				return [new WorkspaceFolderItem(), ...providers];
 			} else {
@@ -82,6 +85,7 @@ export class AppDataProvider implements vscode.TreeDataProvider<TreeData> {
 		} else if (typeof element === "string") {
 			const remoteApps =
 				await this.remoteAppManager.getRemoteApps(element);
+
 			return remoteApps;
 		} else {
 			return [];
