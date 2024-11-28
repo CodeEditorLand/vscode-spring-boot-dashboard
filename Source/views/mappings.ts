@@ -59,6 +59,7 @@ export class Endpoint {
 }
 
 type TreeData = Endpoint | StaticEndpoint | LiveProcess | BootApp;
+
 export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 	private store: Map<LiveProcess, Endpoint[]> = new Map();
 	private staticData: Map<BootApp, StaticEndpoint[]> = new Map();
