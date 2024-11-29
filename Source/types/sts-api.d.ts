@@ -86,6 +86,7 @@ interface BeansQuery extends LiveProcessDataQuery {
 	 * if provided, return corresponding beans via name.
 	 */
 	beanName?: string;
+
 	dependingOn?: string;
 }
 
@@ -95,14 +96,19 @@ interface BeansQuery extends LiveProcessDataQuery {
  */
 export interface LocalLiveProcess {
 	type: "local";
+
 	processKey: string;
+
 	processName: string;
+
 	pid: string;
 }
 
 export interface RemoteLiveProcess {
 	type: "remote";
+
 	processKey: string;
+
 	processName: string;
 }
 
@@ -110,6 +116,8 @@ export type LiveProcessPayload = LocalLiveProcess | RemoteLiveProcess;
 
 interface MetricsQuery extends LiveProcessDataQuery {
 	endpoint: "metrics";
+
 	metricName: string;
+
 	tags?: string;
 }

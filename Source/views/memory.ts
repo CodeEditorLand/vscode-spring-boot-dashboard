@@ -9,34 +9,47 @@ import * as sts from "../types/sts-api";
 
 interface Measurement {
 	statistic: string;
+
 	value: unknown;
 }
 
 interface Metrics {
 	name: string;
+
 	location: vscode.Location;
 
 	// parsed
 	processKey: string;
+
 	time: string;
+
 	label: string;
+
 	description: string;
+
 	baseUnit: string;
+
 	measurements: Measurement[];
+
 	availableTags: { tag: string; values: string[] }[];
 }
 
 export class MemoryViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = "spring.memoryView";
+
 	private storeGcPausesMetrics: Map<LiveProcess, Metrics[][]> = new Map();
+
 	private storeHeapMemoryMetrics: Map<LiveProcess, Metrics[][]> = new Map();
+
 	private storeNonHeapMemoryMetrics: Map<LiveProcess, Metrics[][]> =
 		new Map();
+
 	private storeLiveProcesses: Map<string, LiveProcess> = new Map();
 
 	private _view?: vscode.WebviewView;
 
 	public interval: number;
+
 	public maxDataPoints: number;
 
 	constructor(private context: vscode.ExtensionContext) {}
@@ -74,6 +87,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 						.get("memory-view.fetch-data.delay-in-milliseconds") ??
 					5000;
 			}
+
 			if (
 				e.affectsConfiguration(
 					"spring.dashboard.memory-view.display-data.max-datapoints",
@@ -84,6 +98,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 						.getConfiguration("spring.dashboard")
 						.get("memory-view.display-data.max-datapoints") ?? 10;
 			}
+
 			this.updateSettings();
 		});
 	}
@@ -168,6 +183,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 			vscode.workspace
 				.getConfiguration("spring.dashboard")
 				.get("memory-view.fetch-data.delay-in-milliseconds") ?? 5000;
+
 		this.maxDataPoints =
 			vscode.workspace
 				.getConfiguration("spring.dashboard")
@@ -223,14 +239,17 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 				case "LoadMetrics":
 					if (processKey !== "" && processKey !== undefined) {
 						await refreshMetrics(processKey, "memory");
+
 						await refreshMetrics(processKey, "gcPauses");
 					}
+
 					break;
 
 				case "LoadProcess":
 					this.addLiveProcesses(
 						Array.from(this.storeLiveProcesses.values()),
 					);
+
 					this.updateSettings();
 
 					break;
@@ -242,6 +261,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 						processKey = this.storeLiveProcesses.values().next()
 							.value.liveProcess?.processKey;
 					}
+
 					if (
 						type !== "" &&
 						type === "Heap Memory" &&
@@ -252,6 +272,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 							Array.from(this.storeHeapMemoryMetrics.keys()).find(
 								(lp) => lp.processKey === processKey,
 							) ?? new LiveProcess(processKey);
+
 						this.updateGraph(
 							this.storeHeapMemoryMetrics.get(targetLiveProcess),
 						);
@@ -266,6 +287,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 								this.storeNonHeapMemoryMetrics.keys(),
 							).find((lp) => lp.processKey === processKey) ??
 							new LiveProcess(processKey);
+
 						this.updateGraph(
 							this.storeNonHeapMemoryMetrics.get(
 								targetLiveProcess,
@@ -281,12 +303,15 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 							Array.from(this.storeGcPausesMetrics.keys()).find(
 								(lp) => lp.processKey === processKey,
 							) ?? new LiveProcess(processKey);
+
 						this.updateGraph(
 							this.storeGcPausesMetrics.get(targetLiveProcess),
 						);
 					}
+
 					break;
 				}
+
 				default:
 			}
 		});
@@ -337,6 +362,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 	private addLiveProcess(process: LiveProcess) {
 		if (!this.storeLiveProcesses.get(process.processKey)) {
 			this.storeLiveProcesses.set(process.processKey, process);
+
 			this.addLiveProcesses([process]);
 		}
 	}
@@ -402,6 +428,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 
 			default:
 		}
+
 		if (!store) {
 			return;
 		}
@@ -414,6 +441,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 
 			if (targetLiveProcess) {
 				store.delete(targetLiveProcess);
+
 				this.removeLiveProcess(targetLiveProcess);
 			}
 		} else if (metricsRaw instanceof Array) {
@@ -426,6 +454,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 
 				if (!store.has(targetLiveProcess)) {
 					this.addLiveProcess(targetLiveProcess);
+
 					store.set(targetLiveProcess, []);
 				}
 			} else {
@@ -441,6 +470,7 @@ export class MemoryViewProvider implements vscode.WebviewViewProvider {
 						const latestMetrics = metricsRaw.map((raw) =>
 							parseMetrticsData(liveProcess.processKey, raw),
 						);
+
 						this.rotateMetrics(metrics, latestMetrics);
 					}
 				}

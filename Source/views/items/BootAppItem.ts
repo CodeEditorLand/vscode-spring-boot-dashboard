@@ -49,16 +49,21 @@ export class BootAppItem implements vscode.TreeItem {
 		if (this._app.port) {
 			list.push(`:${this._app.port}`);
 		}
+
 		if (this._app.contextPath) {
 			list.push(this._app.contextPath);
 		}
+
 		if (this._app.activeProfiles?.length) {
 			const profileInfo = `profiles: '${this._app.activeProfiles.join(", ")}'`;
+
 			list.push(profileInfo);
 		}
+
 		if (list.length > 0) {
 			return `[${list.join(", ")}]`;
 		}
+
 		return undefined;
 	}
 

@@ -18,17 +18,24 @@ export enum AppState {
 
 export class BootApp {
 	private _activeSessionName?: string;
+
 	private _jmxPort?: number;
+
 	private _port?: number;
+
 	private _contextPath?: string;
+
 	private _pid?: number;
+
 	private _activeProfiles?: string[];
 
 	private _watchdog?: NodeJS.Timeout; // used to watch running process.
 
 	public mainClasses: MainClassData[];
+
 	public symbols: {
 		beans: lsp.SymbolInformation[];
+
 		mappings: lsp.SymbolInformation[];
 	};
 
@@ -39,6 +46,7 @@ export class BootApp {
 		private _state: AppState,
 	) {
 		this.getWorkspaceSymbols();
+
 		this.getMainClasses();
 	}
 
@@ -84,6 +92,7 @@ export class BootApp {
 
 	public set state(state: AppState) {
 		this._state = state;
+
 		dashboard.appsProvider.refresh(this); // TODO: should do it in LocalAppController.
 		if (this._state === AppState.INACTIVE) {
 			this.clearWatchdog();
@@ -96,6 +105,7 @@ export class BootApp {
 
 	public set port(port: number | undefined) {
 		this._port = port;
+
 		dashboard.appsProvider.refresh(this); // TODO: should do it in LocalAppController.
 	}
 
@@ -125,6 +135,7 @@ export class BootApp {
 
 	public set contextPath(contextPath: string | undefined) {
 		this._contextPath = contextPath ?? "";
+
 		dashboard.appsProvider.refresh(this); // TODO: should do it in LocalAppController.
 	}
 
@@ -144,10 +155,15 @@ export class BootApp {
 
 	public reset() {
 		this._port = undefined;
+
 		this._contextPath = undefined;
+
 		this.pid = undefined;
+
 		this._state = AppState.INACTIVE;
+
 		this._activeProfiles = undefined;
+
 		dashboard.appsProvider.refresh(this); // TODO: should do it in LocalAppController.
 	}
 
@@ -157,15 +173,18 @@ export class BootApp {
 
 			if (!alive) {
 				clearInterval(watchdog);
+
 				this.reset();
 			}
 		}, 2000);
+
 		this._watchdog = watchdog;
 	}
 
 	public clearWatchdog() {
 		if (this._watchdog) {
 			clearInterval(this._watchdog);
+
 			this._watchdog = undefined;
 		}
 	}
@@ -185,6 +204,7 @@ export class BootApp {
 				return [];
 			}
 		}
+
 		return this.mainClasses;
 	}
 
@@ -195,6 +215,7 @@ export class BootApp {
 		if (!this.symbols) {
 			this.symbols = await requestWorkspaceSymbols(this.path);
 		}
+
 		return this.symbols;
 	}
 }

@@ -24,6 +24,7 @@ export async function initialize(): Promise<ExtensionAPI> {
 		if (!stsExt) {
 			throw new Error("Extension vmware.vscode-spring-boot not enabled.");
 		}
+
 		stsApi = await stsExt.activate();
 
 		return stsApi;
@@ -81,6 +82,7 @@ export async function getGcPausesMetrics(processKey: string) {
 			metricName: "gcPauses",
 		});
 	}
+
 	return "";
 }
 
@@ -92,6 +94,7 @@ export async function getMemoryMetrics(processKey: string, memory: string) {
 			metricName: memory,
 		});
 	}
+
 	return "";
 }
 
@@ -103,6 +106,7 @@ export async function refreshMetrics(processKey: string, metricName: string) {
 			metricName: metricName,
 		});
 	}
+
 	return "";
 }
 
@@ -167,6 +171,7 @@ export async function getMainClass(processKey: string) {
 
 		return await getMainClassFromPid(pid);
 	}
+
 	return mainClass;
 }
 
@@ -199,11 +204,13 @@ async function getJreHome() {
 	if (!javaExt) {
 		return undefined;
 	}
+
 	return javaExt.exports.javaRequirement?.tooling_jre;
 }
 
 export async function requestWorkspaceSymbols(projectPath?: string): Promise<{
 	beans: lsp.SymbolInformation[];
+
 	mappings: lsp.SymbolInformation[];
 }> {
 	let filter = "";
@@ -212,8 +219,10 @@ export async function requestWorkspaceSymbols(projectPath?: string): Promise<{
 		const locationPrefix = vscode.Uri.file(
 			sanitizeFilePath(projectPath),
 		).toString();
+
 		filter = `locationPrefix:${locationPrefix}?`;
 	}
+
 	const beans =
 		(await stsApi?.client.sendRequest<lsp.SymbolInformation[]>(
 			"workspace/symbol",

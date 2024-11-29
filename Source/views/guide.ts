@@ -59,6 +59,7 @@ export function init(context: vscode.ExtensionContext) {
 
 					try {
 						await vscode.workspace.fs.readFile(pomUri);
+
 						await vscode.commands.executeCommand(
 							"maven.project.addDependency",
 							{
@@ -85,6 +86,7 @@ export function init(context: vscode.ExtensionContext) {
 							// save pom.xml to apply change
 							const textEditor =
 								await vscode.window.showTextDocument(pomUri);
+
 							await textEditor.document.save();
 							// force to reload project in case of pending interaction
 							await vscode.commands.executeCommand(
@@ -100,6 +102,7 @@ export function init(context: vscode.ExtensionContext) {
 								app.path,
 							);
 						}
+
 						return;
 					} catch (error) {
 						console.log(error);

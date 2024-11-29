@@ -25,6 +25,7 @@ export async function showDependencies(bean?: Bean | BeanItem) {
 	if (bean) {
 		currentBean = bean instanceof BeanItem ? bean.item : bean;
 	}
+
 	await showBeanHierarchy(currentBean, BeansDirection.Dependencies);
 }
 
@@ -38,6 +39,7 @@ export async function showInjectedInto(bean?: Bean | BeanItem) {
 	if (bean) {
 		currentBean = bean instanceof BeanItem ? bean.item : bean;
 	}
+
 	await showBeanHierarchy(currentBean, BeansDirection.InjectedInto);
 }
 
@@ -57,6 +59,7 @@ export async function showBeanHierarchy(
 		if (detail?.length) {
 			// successful, update contextKey and cached direction etc.
 			currentBean = bean;
+
 			currentDirection =
 				direction ?? currentDirection ?? DEFAULT_DIRECTION;
 
@@ -64,6 +67,7 @@ export async function showBeanHierarchy(
 				currentDirection === BeansDirection.Dependencies
 					? "dependencies"
 					: "injectedInto";
+
 			await vscode.commands.executeCommand(
 				"setContext",
 				"beanHierarchy:direction",
@@ -82,6 +86,7 @@ export async function showBeanHierarchy(
 				beanWithDetail,
 				currentDirection,
 			);
+
 			tree.setInput(input);
 		} else {
 			// no bean detail, e.g. inner beans, do nothing.

@@ -13,6 +13,7 @@ function fallbackProtocol2CodeConverter() {
 	if (!p2c) {
 		p2c = createConverter(undefined, undefined);
 	}
+
 	return p2c;
 }
 
@@ -44,5 +45,6 @@ export function sanitizeFilePath(uriLike: string | vscode.Uri) {
 	if (uriLike instanceof vscode.Uri) {
 		return uriLike.fsPath;
 	}
+
 	return vscode.Uri.parse(uriLike).fsPath;
 }

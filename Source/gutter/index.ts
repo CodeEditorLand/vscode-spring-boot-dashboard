@@ -51,6 +51,7 @@ export function init(context: vscode.ExtensionContext) {
 			"gutter-bean.svg",
 		),
 	});
+
 	DECORATION_TYPE_ENDPOINT = vscode.window.createTextEditorDecorationType({
 		isWholeLine: true,
 		gutterIconPath: vscode.Uri.joinPath(
@@ -65,16 +66,20 @@ export function init(context: vscode.ExtensionContext) {
 			textEditors.forEach(decorateEditor);
 		}),
 	);
+
 	disposables.push(
 		vscode.workspace.onDidSaveTextDocument(async (e) => {
 			if (e === vscode.window.activeTextEditor?.document) {
 				// TODO: magic number here because you have to wait STS-LS to update workspace symbols before querying it.
 				await sleep(1000);
+
 				await initSymbols();
+
 				decorateEditor(vscode.window.activeTextEditor);
 			}
 		}),
 	);
+
 	vscode.window.visibleTextEditors.forEach(decorateEditor);
 }
 
@@ -99,7 +104,9 @@ function setDecorationOptions(
 
 	for (
 		let lineNumber = 0;
+
 		lineNumber < textEditor.document.lineCount;
+
 		lineNumber++
 	) {
 		if (beanLines.includes(lineNumber)) {
@@ -130,7 +137,9 @@ function setDecorationOptions(
 			}
 		}
 	}
+
 	textEditor.setDecorations(DECORATION_TYPE_BEAN, [...beanDecorations]);
+
 	textEditor.setDecorations(DECORATION_TYPE_ENDPOINT, [
 		...mappingDecorations,
 	]);
@@ -147,6 +156,7 @@ function getBeanGutterHover(bean: StaticBean) {
 		`$(telescope)[Reveal In Dashboard](${commandUri})\n\nBean: ${bean.label}`,
 		true,
 	);
+
 	message.isTrusted = true;
 
 	return message;
@@ -163,6 +173,7 @@ function getEndpointGutterHover(endpoint: StaticEndpoint) {
 		`$(telescope)[Reveal In Dashboard](${commandUri})\n\nEndpoint: ${endpoint.label}`,
 		true,
 	);
+
 	message.isTrusted = true;
 
 	return message;

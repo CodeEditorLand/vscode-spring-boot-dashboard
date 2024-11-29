@@ -14,9 +14,11 @@ export function readAll(input: Readable): Promise<string> {
 		input.on("data", (data) => {
 			buffer += data;
 		});
+
 		input.on("error", (error) => {
 			reject(error);
 		});
+
 		input.on("end", () => {
 			resolve(buffer.toString());
 		});
@@ -47,6 +49,7 @@ export function isActuatorJarFile(f: string): boolean {
 	if (/^spring-boot-actuator-\d+\.\d+\.\d+(.*)?.jar$/.test(fileName)) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -82,11 +85,13 @@ export function constructOpenUrl(
 			.replace("{port}", String(port))
 			.replace("{contextPath}", contextPath.toString());
 	}
+
 	return `${openUrl}${pathSeg ?? "/"}`;
 }
 
 export async function showFilterInView(viewId: string) {
 	await vscode.commands.executeCommand(`${viewId}.focus`);
+
 	await vscode.commands.executeCommand("list.find");
 }
 

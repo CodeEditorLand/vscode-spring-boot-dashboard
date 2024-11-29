@@ -21,14 +21,19 @@ export class PropertiesProvider implements vscode.TreeDataProvider<TreeData> {
 			return element.toTreeItem();
 		} else if (element instanceof Property) {
 			const item = new vscode.TreeItem(element.name);
+
 			item.description = element.value;
+
 			item.iconPath = new vscode.ThemeIcon("symbol-value");
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
 
 			return item;
 		} else if (element instanceof PropertyGroup) {
 			const item = new vscode.TreeItem(element.name);
+
 			item.iconPath = new vscode.ThemeIcon("symbol-namespace");
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 
 			return item;
@@ -50,6 +55,7 @@ export class PropertiesProvider implements vscode.TreeDataProvider<TreeData> {
 					ret.push(lp);
 				}
 			}
+
 			return ret;
 		} else if (element instanceof LiveProcess) {
 			const pgs = await element.getProperties();

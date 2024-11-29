@@ -51,6 +51,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	if (getAiKey()) {
 		initialize(getExtensionId(), getExtensionVersion(), getAiKey());
 	}
+
 	return await instrumentOperation(
 		"activation",
 		initializeExtension,
@@ -72,6 +73,7 @@ export async function initializeExtension(
 		remoteAppManager,
 		context,
 	);
+
 	dashboard.appsProvider = appsProvider;
 
 	const controller: LocalAppController = new LocalAppController(
@@ -83,7 +85,9 @@ export async function initializeExtension(
 		treeDataProvider: appsProvider,
 		showCollapseAll: false,
 	});
+
 	context.subscriptions.push(appsView);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring-boot-dashboard.refresh",
@@ -139,11 +143,13 @@ export async function initializeExtension(
 			controller.onDidStartBootApp(session);
 		}
 	});
+
 	vscode.debug.onDidTerminateDebugSession((session: vscode.DebugSession) => {
 		if (session.type === "java") {
 			controller.onDidStopBootApp(session);
 		}
 	});
+
 	vscode.debug.onDidReceiveDebugSessionCustomEvent((e) => {
 		if (e.session.type === "java" && e.event === "processid") {
 			const app = appsProvider.manager
@@ -160,13 +166,16 @@ export async function initializeExtension(
 
 	// live data
 	const beansProvider = new BeansDataProvider();
+
 	dashboard.beansProvider = beansProvider;
 
 	const beansView = vscode.window.createTreeView("spring.beans", {
 		treeDataProvider: beansProvider,
 		showCollapseAll: true,
 	});
+
 	context.subscriptions.push(beansView);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand("spring.beans.reveal", (element) => {
 			// find and focus on specific element if possible.
@@ -184,13 +193,16 @@ export async function initializeExtension(
 	);
 
 	const mappingsProvider = new MappingsDataProvider();
+
 	dashboard.mappingsProvider = mappingsProvider;
 
 	const mappingsView = vscode.window.createTreeView("spring.mappings", {
 		treeDataProvider: mappingsProvider,
 		showCollapseAll: true,
 	});
+
 	context.subscriptions.push(mappingsView);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.mappings.reveal",
@@ -224,71 +236,83 @@ export async function initializeExtension(
 	}
 
 	await initLiveDataController();
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.endpoint.open",
 			openEndpointHandler,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.endpoint.navigate",
 			navigateToLocation,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.open",
 			openBeanHandler,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.navigate",
 			navigateToLocation,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.mapping.showAll",
 			() => (mappingsProvider.showAll = true),
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.mapping.showDefined",
 			() => (mappingsProvider.showAll = false),
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.showAll",
 			() => (beansProvider.showAll = true),
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.showDefined",
 			() => (beansProvider.showAll = false),
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand("spring.staticData.refresh", () =>
 			initSymbols(0, true),
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.showDependencies",
 			showDependencies,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.showInjectedInto",
 			showInjectedInto,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.dashboard.bean.showHierarchy",
@@ -297,6 +321,7 @@ export async function initializeExtension(
 	);
 
 	initActuatorGuide(context);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"_spring.project.run",
@@ -332,6 +357,7 @@ export async function initializeExtension(
 	if (gutterEnabled()) {
 		initGutter(context);
 	}
+
 	vscode.workspace.onDidChangeConfiguration((e) => {
 		if (e.affectsConfiguration("spring.dashboard.enableGutter")) {
 			if (gutterEnabled()) {
@@ -346,6 +372,7 @@ export async function initializeExtension(
 	context.subscriptions.push(
 		vscode.commands.registerCommand("_spring.console.log", console.log),
 	);
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand(
 			"_spring.symbols",
@@ -355,7 +382,9 @@ export async function initializeExtension(
 
 	// memory view
 	const memoryViewProvider = new MemoryViewProvider(context);
+
 	dashboard.memoryViewProvider = memoryViewProvider;
+
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(
 			"spring.memoryView",
@@ -365,7 +394,9 @@ export async function initializeExtension(
 
 	// properties view
 	const propertiesProvider = new PropertiesProvider();
+
 	dashboard.propertiesProvider = propertiesProvider;
+
 	context.subscriptions.push(
 		vscode.window.createTreeView("spring.properties", {
 			treeDataProvider: propertiesProvider,
@@ -384,6 +415,7 @@ export async function initializeExtension(
 			connectRemoteApp,
 		),
 	);
+
 	context.subscriptions.push(
 		instrumentOperationAsVsCodeCommand(
 			"spring.remoteApp.disconnect",

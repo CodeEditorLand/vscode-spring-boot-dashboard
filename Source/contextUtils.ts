@@ -29,9 +29,13 @@ export async function loadPackageInfo(
 	);
 
 	const { publisher, name, version, aiKey } = JSON.parse(raw);
+
 	EXTENSION_AI_KEY = aiKey;
+
 	EXTENSION_PUBLISHER = publisher;
+
 	EXTENSION_NAME = name;
+
 	EXTENSION_VERSION = version;
 
 	TEMP_FOLDER_PER_USER = path.join(
@@ -62,6 +66,7 @@ export function getPathToExtensionRoot(...args: string[]): string {
 	if (!ext) {
 		throw new Error("Cannot identify extension root.");
 	}
+
 	return path.join(ext.extensionPath, ...args);
 }
 
@@ -69,5 +74,6 @@ export function getPathToWorkspaceStorage(...args: string[]): Uri | undefined {
 	if (EXTENSION_CONTEXT.storageUri === undefined) {
 		return undefined;
 	}
+
 	return Uri.joinPath(EXTENSION_CONTEXT.storageUri, ...args);
 }

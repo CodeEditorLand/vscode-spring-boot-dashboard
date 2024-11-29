@@ -30,12 +30,15 @@ function isBootAppClasspath(cp: ClassPathData): boolean {
 			}
 		}
 	}
+
 	return false;
 }
 
 export class LocalAppManager {
 	private _boot_projects: Map<string, BootApp> = new Map();
+
 	private _bindedSessions: Map<string, DebugSession> = new Map();
+
 	private _onDidChangeApps: vscode.EventEmitter<BootApp | undefined> =
 		new vscode.EventEmitter<BootApp | undefined>();
 
@@ -79,6 +82,7 @@ export class LocalAppManager {
 
 	public bindDebugSession(app: BootApp, session: DebugSession): void {
 		app.activeSessionName = session.name;
+
 		this._bindedSessions.set(app.path, session);
 	}
 
@@ -120,6 +124,7 @@ export class LocalAppManager {
 
 						if (current) {
 							current.name = name;
+
 							current.classpath = entries;
 						} else {
 							this._boot_projects.set(
@@ -136,10 +141,12 @@ export class LocalAppManager {
 						this._boot_projects.delete(location);
 					}
 				}
+
 				this.fireDidChangeApps(undefined);
 				// update workspace symbols for beans/mappings
 				initSymbols(5000).then(() => {
 					dashboard.beansProvider.refresh(undefined);
+
 					dashboard.mappingsProvider.refresh(undefined);
 				});
 			},
@@ -159,6 +166,7 @@ export class LocalAppManager {
 					const javaExtApi: ExtensionAPI = await vscode.extensions
 						.getExtension("redhat.java")
 						?.activate();
+
 					await javaExtApi?.serverReady?.(); // add '?' for compatibility with old versions.
 					await vscode.commands.executeCommand(
 						"java.execute.workspaceCommand",

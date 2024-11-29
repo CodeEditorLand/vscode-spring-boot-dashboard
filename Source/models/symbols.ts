@@ -27,12 +27,15 @@ export async function init(timeout?: number) {
 
 	do {
 		const symbols = await requestWorkspaceSymbols();
+
 		beans = symbols.beans;
+
 		mappings = symbols.mappings;
 
 		if (retry !== 0) {
 			await sleep(INTERVAL);
 		}
+
 		retry++;
 	} while (!beans?.length && !mappings?.length && retry * INTERVAL < TIMEOUT);
 
@@ -94,6 +97,7 @@ export async function navigateToLocation(
 	}
 
 	const { uri, range } = location;
+
 	await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(uri), {
 		preserveFocus: true,
 		selection: range,

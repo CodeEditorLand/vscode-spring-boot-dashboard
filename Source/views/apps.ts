@@ -20,6 +20,7 @@ type TreeData =
 
 export class AppDataProvider implements vscode.TreeDataProvider<TreeData> {
 	private emitter: vscode.EventEmitter<TreeData | undefined>;
+
 	public readonly onDidChangeTreeData: vscode.Event<TreeData | undefined>;
 
 	constructor(
@@ -30,7 +31,9 @@ export class AppDataProvider implements vscode.TreeDataProvider<TreeData> {
 		this.emitter = new vscode.EventEmitter<TreeData | undefined>();
 
 		this.onDidChangeTreeData = this.emitter.event;
+
 		this.manager.onDidChangeApps((e) => this.emitter.fire(e));
+
 		this.remoteAppManager.onDidProviderDataChange((e) =>
 			this.emitter.fire(e),
 		);
@@ -48,29 +51,38 @@ export class AppDataProvider implements vscode.TreeDataProvider<TreeData> {
 		} else if (typeof element === "string") {
 			// providers
 			const item = new vscode.TreeItem(element);
+
 			item.iconPath =
 				this.remoteAppManager.getIconPath(element) ??
 				vscode.ThemeIcon.Folder;
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+
 			item.contextValue = `spring:remoteAppProvider+${element}`;
 
 			return item;
 		} else {
 			// remote apps
 			const item = new vscode.TreeItem(element.name);
+
 			item.iconPath = element.iconPath ?? new vscode.ThemeIcon("project");
+
 			item.contextValue = "spring:remoteApp";
 
 			if (element.group) {
 				item.contextValue += `+${element.group}`;
 			}
+
 			if (connectedProcessKeys().includes(processKey(element))) {
 				item.contextValue += "+connected";
+
 				item.description = "connected";
 			}
+
 			return item;
 		}
 	}
+
 	async getChildren(element?: TreeData | undefined): Promise<TreeData[]> {
 		if (!element) {
 			const providers = this.remoteAppManager.getProviderNames();

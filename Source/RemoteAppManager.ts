@@ -8,7 +8,9 @@ import {
 
 class RemoteAppProviderRegistryEntry {
 	public name: string;
+
 	public providers: RemoteBootAppDataProvider[];
+
 	public iconPath?:
 		| string
 		| Uri
@@ -21,7 +23,9 @@ class RemoteAppProviderRegistryEntry {
 		options?: RemoteBootAppDataProviderOptions,
 	) {
 		this.name = providerName;
+
 		this.providers = [provider];
+
 		this.iconPath = options?.iconPath;
 	}
 
@@ -44,15 +48,20 @@ class RemoteAppProviderRegistryEntry {
 
 export class RemoteAppManager {
 	apps: Map<string, RemoteBootAppData[]>;
+
 	registry: Map<string, RemoteAppProviderRegistryEntry>;
+
 	emitter: EventEmitter<string>;
 
 	public onDidProviderDataChange: Event<string>;
 
 	constructor() {
 		this.registry = new Map();
+
 		this.emitter = new EventEmitter();
+
 		this.apps = new Map();
+
 		this.onDidProviderDataChange = this.emitter.event;
 	}
 
@@ -65,6 +74,7 @@ export class RemoteAppManager {
 
 		if (entry) {
 			entry.addProvider(provider);
+
 			entry.updateOptions(options);
 		} else {
 			entry = new RemoteAppProviderRegistryEntry(
@@ -73,6 +83,7 @@ export class RemoteAppManager {
 				options,
 			);
 		}
+
 		this.registry.set(providerName, entry);
 
 		if (provider.onDidChangeData) {
@@ -96,6 +107,7 @@ export class RemoteAppManager {
 		if (providers) {
 			for (const p of providers) {
 				const apps = await p.provide();
+
 				ret.push(...apps);
 			}
 		}
@@ -110,8 +122,10 @@ export class RemoteAppManager {
 
 		for (const providerName of this.getProviderNames()) {
 			const apps = this.apps.get(providerName) ?? [];
+
 			ret.push(...apps);
 		}
+
 		return ret;
 	}
 

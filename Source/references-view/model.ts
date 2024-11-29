@@ -15,6 +15,7 @@ import {
 
 export class BeansTreeInput implements SymbolTreeInput<BeanItem> {
 	readonly contextValue: string = "beanHierarchy";
+
 	readonly title: string;
 
 	constructor(
@@ -61,7 +62,9 @@ class BeansModel implements SymbolTreeModel<BeanItem> {
 	readonly roots: BeanItem[] = [];
 
 	private readonly _onDidChange = new vscode.EventEmitter<BeansModel>();
+
 	readonly onDidChange = this._onDidChange.event;
+
 	readonly provider: BeanDataProvider;
 
 	constructor(
@@ -71,6 +74,7 @@ class BeansModel implements SymbolTreeModel<BeanItem> {
 		this.roots = items.map(
 			(item) => new BeanItem(this, item, undefined, undefined),
 		);
+
 		this.provider = new BeanDataProvider(this);
 	}
 
@@ -80,7 +84,9 @@ class BeansModel implements SymbolTreeModel<BeanItem> {
 
 	// TODO
 	navigation?: SymbolItemNavigation<BeanItem> | undefined;
+
 	highlights?: SymbolItemEditorHighlights<BeanItem> | undefined;
+
 	dnd?: SymbolItemDragAndDrop<BeanItem> | undefined;
 }
 
@@ -91,13 +97,17 @@ class BeanDataProvider implements vscode.TreeDataProvider<BeanItem> {
 
 	public getTreeItem(element: BeanItem): vscode.TreeItem {
 		const item = new vscode.TreeItem(element.item.id);
+
 		item.collapsibleState = element.parent
 			? vscode.TreeItemCollapsibleState.Collapsed
 			: vscode.TreeItemCollapsibleState.Expanded;
 
 		const themeColor = new vscode.ThemeColor("charts.green");
+
 		item.iconPath = new vscode.ThemeIcon("spring-bean", themeColor);
+
 		item.contextValue = "spring:bean";
+
 		item.command = {
 			command: "spring.dashboard.bean.open",
 			title: "Open",

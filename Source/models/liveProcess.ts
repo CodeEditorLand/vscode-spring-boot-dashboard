@@ -10,7 +10,9 @@ import { getProperties } from "./stsApi";
 
 export class LiveProcess {
 	app: BootApp | undefined;
+
 	remoteApp: RemoteBootAppData | undefined;
+
 	propertyGroups: PropertyGroup[] | undefined;
 
 	constructor(private payload: sts.LiveProcessPayload) {
@@ -20,9 +22,11 @@ export class LiveProcess {
 			if (!app) {
 				// fallback: here assume processName is full-qualified name of mainclass, which is not guaranteed.
 				const mainClass = payload.processName;
+
 				app =
 					dashboard.appsProvider.manager.getAppByMainClass(mainClass);
 			}
+
 			this.app = app;
 		} else if (payload.type === "remote") {
 			const host = payload.processName.split(" - ")?.[1]; // TODO: should request upstream API for identifier of a unique remote app.
@@ -30,6 +34,7 @@ export class LiveProcess {
 				dashboard.appsProvider.remoteAppManager.getRemoteAppByHost(
 					host,
 				);
+
 			this.remoteApp = remoteApp;
 		} else {
 			// Not coverred.
@@ -61,14 +66,17 @@ export class LiveProcess {
 
 		if (this.type === "local") {
 			item = new vscode.TreeItem(this.appName);
+
 			item.description = `pid: ${this.pid}`;
 		} else {
 			item = new vscode.TreeItem(this.remoteAppName);
+
 			item.description = this.remoteApp?.jmxurl;
 		}
 
 		item.iconPath = BootAppItem.RUNNING_ICON(); // TODO: should use customized icon based on connection type
 		item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+
 		item.contextValue = "liveProcess";
 
 		return item;
@@ -90,12 +98,16 @@ export class LiveProcess {
 
 				for (const prop of properties) {
 					const { property, value } = prop;
+
 					new Property(property, value, group);
 				}
+
 				propertyGroups.push(group);
 			}
+
 			this.propertyGroups = propertyGroups;
 		}
+
 		return this.propertyGroups;
 	}
 }

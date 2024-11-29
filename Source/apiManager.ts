@@ -16,6 +16,7 @@ export class ApiManager {
 					provider,
 					options,
 				);
+
 				dashboard.appsProvider.refresh(undefined); // trigger a refresh when new provider is registered.
 			},
 			connectRemoteApp,
@@ -27,6 +28,7 @@ export class ApiManager {
 		if (!this.api) {
 			throw new Error("API instance is not initialized");
 		}
+
 		return this.api;
 	}
 }

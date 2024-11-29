@@ -16,6 +16,7 @@ import { constructOpenUrl } from "../utils";
 export class Endpoint {
 	// raw
 	processKey: string;
+
 	rawDataMap: any;
 
 	corresponding?: StaticEndpoint; // whether it's defined in workspace
@@ -23,6 +24,7 @@ export class Endpoint {
 
 	constructor(processKey: string, rawDataMap?: any) {
 		this.processKey = processKey;
+
 		this.rawDataMap = rawDataMap;
 	}
 
@@ -42,6 +44,7 @@ export class Endpoint {
 		if (this.method) {
 			label += ` [${this.method}]`;
 		}
+
 		return label;
 	}
 
@@ -62,6 +65,7 @@ type TreeData = Endpoint | StaticEndpoint | LiveProcess | BootApp;
 
 export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 	private store: Map<LiveProcess, Endpoint[]> = new Map();
+
 	private staticData: Map<BootApp, StaticEndpoint[]> = new Map();
 
 	private _showAll = false;
@@ -83,11 +87,13 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 
 	public set showAll(value: boolean) {
 		this._showAll = value;
+
 		vscode.commands.executeCommand(
 			"setContext",
 			"spring.mappings:showMode",
 			this._showAll ? "all" : "defined",
 		);
+
 		this.onDidRefreshMappings.fire(undefined);
 	}
 
@@ -100,7 +106,9 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			return element.toTreeItem();
 		} else if (element instanceof BootApp) {
 			const item = new vscode.TreeItem(element.name);
+
 			item.iconPath = element.iconPath;
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 
 			item.contextValue = `bootApp+${element.state}`;
@@ -108,6 +116,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			if (!element.isActuatorOnClasspath) {
 				item.contextValue += "+noActuator";
 			}
+
 			return item;
 		} else {
 			const isLive = !!(element as Endpoint).processKey;
@@ -117,11 +126,13 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const item = new vscode.TreeItem(label);
 
 			item.tooltip = (element as Endpoint).handler;
+
 			item.collapsibleState = vscode.TreeItemCollapsibleState.None;
 
 			const themeColor = isLive
 				? new vscode.ThemeColor("charts.green")
 				: undefined;
+
 			item.iconPath = new vscode.ThemeIcon("link", themeColor);
 
 			item.contextValue = isLive
@@ -142,6 +153,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			if (this.showAll && (element as any).corresponding) {
 				item.description = "(defined)";
 			}
+
 			return item;
 		}
 	}
@@ -152,6 +164,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const ret = [];
 
 			const liveProcesses = Array.from(this.store.keys());
+
 			ret.push(...liveProcesses);
 			// update context key
 			vscode.commands.executeCommand(
@@ -168,7 +181,9 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 			const appsWithoutLiveProcess = staticApps.filter(
 				(app) => !liveProcesses.find((lp) => lp.appName === app.name),
 			);
+
 			ret.push(...appsWithoutLiveProcess);
+
 			ret.sort((a, b) =>
 				(
 					(a as LiveProcess).appName ?? (a as BootApp).name
@@ -183,6 +198,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 		// all mappings
 		if (element instanceof LiveProcess) {
 			const liveMappings = this.store.get(element);
+
 			liveMappings?.forEach((lm) => (lm.liveProcess = element));
 			// TODO: inaccurate match with project name. should use some unique identifier like path.
 			const correspondingApp = Array.from(this.staticData.keys()).find(
@@ -207,6 +223,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 					return liveMappings?.filter((lm) => lm.corresponding);
 				}
 			}
+
 			return fullList;
 		} else if (element instanceof BootApp) {
 			return this.staticData.get(element);
@@ -227,6 +244,7 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 				this.staticData.get(k)?.includes(element),
 			);
 		}
+
 		return undefined;
 	}
 
@@ -259,13 +277,16 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 					(raw) => new Endpoint(liveProcess.processKey, raw.data.map),
 				)
 				.sort((a, b) => a.label.localeCompare(b.label));
+
 			this.store.set(targetLiveProcess, mappings);
 		}
+
 		this.onDidRefreshMappings.fire(undefined);
 	}
 
 	public refreshStatic(app: BootApp, mappingsRaw: SymbolInformation[]) {
 		this.updateStaticData(app, mappingsRaw);
+
 		this.onDidRefreshMappings.fire(undefined);
 	}
 
@@ -273,8 +294,10 @@ export class MappingsDataProvider implements vscode.TreeDataProvider<TreeData> {
 		const mappings = mappingsRaw
 			.map((raw) => new StaticEndpoint(raw))
 			.sort((a, b) => a.label.localeCompare(b.label));
+
 		this.staticData.set(app, mappings);
 	}
+
 	public getMappingBySymbol(symbolLike: {
 		location: vscode.Location;
 	}): Endpoint | StaticEndpoint | undefined {
@@ -321,6 +344,7 @@ export async function openEndpointHandler(endpoint: Endpoint) {
 			hostname = vscode.Uri.parse(jmxurl).authority;
 		}
 	}
+
 	let url: string | undefined = constructOpenUrl(
 		contextPath,
 		port,
@@ -329,12 +353,14 @@ export async function openEndpointHandler(endpoint: Endpoint) {
 	);
 
 	// promp to fill {variables}
+
 	if (url?.match(/\{.*\}/)) {
 		const start = url.indexOf("{");
 
 		const end = url.indexOf("}", start) + 1;
 
 		const templateVariable = url.slice(start, end);
+
 		url = await vscode.window.showInputBox({
 			value: url,
 			valueSelection: [start, end],
@@ -356,6 +382,7 @@ export async function openEndpointHandler(endpoint: Endpoint) {
 			: "simpleBrowser.api.open";
 
 		let uri = vscode.Uri.parse(url);
+
 		uri = await vscode.env.asExternalUri(uri); // Enables Remote envs like Codespaces
 		vscode.commands.executeCommand(browserCommand, uri);
 	}

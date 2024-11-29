@@ -46,6 +46,7 @@ export class LocalAppController {
 
 			if (appsToRun !== undefined) {
 				const appPaths = appsToRun.map((elem) => elem.path);
+
 				await Promise.all(
 					appList
 						.filter((app) => appPaths.indexOf(app.path) > -1)
@@ -84,6 +85,7 @@ export class LocalAppController {
 								},
 							);
 				}
+
 				return null;
 			},
 		);
@@ -93,6 +95,7 @@ export class LocalAppController {
 
 			return;
 		}
+
 		if (mainClasData === undefined) {
 			return;
 		}
@@ -102,12 +105,14 @@ export class LocalAppController {
 		if (!targetConfig) {
 			targetConfig = await this._createNewLaunchConfig(mainClasData);
 		}
+
 		app.activeSessionName = targetConfig.name;
 
 		targetConfig =
 			await resolveDebugConfigurationWithSubstitutedVariables(
 				targetConfig,
 			);
+
 		app.jmxPort = parseJMXPort(targetConfig.vmArgs);
 
 		const cwdUri: vscode.Uri = vscode.Uri.parse(app.path);
@@ -152,6 +157,7 @@ export class LocalAppController {
 
 					if (res !== null) {
 						const matchedProfile = res[1];
+
 						detectedProfiles.push(matchedProfile);
 					}
 				}
@@ -159,6 +165,7 @@ export class LocalAppController {
 				console.log(error);
 			}
 		}
+
 		const selectedProfiles = await vscode.window.showQuickPick(
 			detectedProfiles,
 			{
@@ -172,6 +179,7 @@ export class LocalAppController {
 
 		if (selectedProfiles !== undefined) {
 			const profileArgs = selectedProfiles.join(",");
+
 			await this.runBootApp(app, debug, profileArgs);
 		}
 	}
@@ -199,6 +207,7 @@ export class LocalAppController {
 			if (isActuatorOnClasspath(session.configuration)) {
 				// actuator enabled: wait live connection to update running state.
 				this._setState(app, AppState.LAUNCHING);
+
 				sendInfo("", {
 					name: "onDidStartBootApp",
 					withActuator: "true",
@@ -208,6 +217,7 @@ export class LocalAppController {
 				this._setState(app, AppState.RUNNING);
 				// Guide to enable actuator
 				this.showActuatorGuideIfNecessary(app);
+
 				sendInfo("", {
 					name: "onDidStartBootApp",
 					withActuator: "false",
@@ -237,6 +247,7 @@ export class LocalAppController {
 
 			if (appsToStop !== undefined) {
 				const appPaths = appsToStop.map((elem) => elem.path);
+
 				await Promise.all(
 					appList
 						.filter((app) => appPaths.indexOf(app.path) > -1)
@@ -258,6 +269,7 @@ export class LocalAppController {
 					process.kill(app.pid);
 				} catch (error) {
 					console.log(error);
+
 					app.reset();
 				}
 			} else {
@@ -369,6 +381,7 @@ export class LocalAppController {
 				: "simpleBrowser.api.open";
 
 			let uri = vscode.Uri.parse(openUrl);
+
 			uri = await vscode.env.asExternalUri(uri); // Enables Remote envs like Codespaces
 			vscode.commands.executeCommand(browserCommand, uri);
 		} else {
@@ -381,14 +394,18 @@ export class LocalAppController {
 	private async _printJavaProcessError(javaProcess: ChildProcess) {
 		if (javaProcess.stderr) {
 			const err = await readAll(javaProcess.stderr);
+
 			console.log(err);
 		}
 	}
 
 	private _setState(app: BootApp, state: AppState): void {
 		app.state = state;
+
 		this.manager.fireDidChangeApps(app);
+
 		dashboard.beansProvider.refresh(app);
+
 		dashboard.mappingsProvider.refresh(app);
 	}
 
@@ -419,6 +436,7 @@ export class LocalAppController {
 		if (projectName !== undefined) {
 			name += `<${projectName}>`;
 		}
+
 		return name;
 	}
 
@@ -447,7 +465,9 @@ export class LocalAppController {
 
 		const configs: vscode.DebugConfiguration[] =
 			launchConfigurations.configurations;
+
 		configs.push(newConfig);
+
 		await launchConfigurations.update(
 			"configurations",
 			configs,
@@ -463,12 +483,14 @@ export class LocalAppController {
 		const key = "LastTimeSeenActuatorGuide";
 
 		const lastMonth = new Date();
+
 		lastMonth.setMonth(lastMonth.getMonth() - 1);
 
 		const lastTimeSeen: number = this.context.globalState.get(key) ?? 0;
 
 		if (new Date(lastTimeSeen) < lastMonth) {
 			this.context.globalState.update(key, Date.now());
+
 			vscode.commands.executeCommand(
 				command,
 				app,
@@ -491,6 +513,7 @@ function isActuatorOnClasspath(
 	if (Array.isArray(debugConfiguration.classPaths)) {
 		return !!debugConfiguration.classPaths.find(isActuatorJarFile);
 	}
+
 	return false;
 }
 
@@ -509,14 +532,17 @@ async function resolveDebugConfigurationWithSubstitutedVariables(
 	) {
 		debugConfiguration.vmArgs += " -Dcom.sun.management.jmxremote";
 	}
+
 	if (
 		debugConfiguration.vmArgs.indexOf(
 			"-Dcom.sun.management.jmxremote.port",
 		) < 0
 	) {
 		const jmxport = await getPort();
+
 		debugConfiguration.vmArgs += ` -Dcom.sun.management.jmxremote.port=${jmxport}`;
 	}
+
 	if (
 		debugConfiguration.vmArgs.indexOf(
 			"-Dcom.sun.management.jmxremote.authenticate=",
@@ -525,6 +551,7 @@ async function resolveDebugConfigurationWithSubstitutedVariables(
 		debugConfiguration.vmArgs +=
 			" -Dcom.sun.management.jmxremote.authenticate=false";
 	}
+
 	if (
 		debugConfiguration.vmArgs.indexOf(
 			"-Dcom.sun.management.jmxremote.ssl=",
@@ -533,12 +560,15 @@ async function resolveDebugConfigurationWithSubstitutedVariables(
 		debugConfiguration.vmArgs +=
 			" -Dcom.sun.management.jmxremote.ssl=false";
 	}
+
 	if (debugConfiguration.vmArgs.indexOf("-Dspring.jmx.enabled=") < 0) {
 		debugConfiguration.vmArgs += " -Dspring.jmx.enabled=true";
 	}
+
 	if (debugConfiguration.vmArgs.indexOf("-Djava.rmi.server.hostname=") < 0) {
 		debugConfiguration.vmArgs += " -Djava.rmi.server.hostname=localhost";
 	}
+
 	if (
 		debugConfiguration.vmArgs.indexOf(
 			"-Dspring.application.admin.enabled=",
@@ -546,6 +576,7 @@ async function resolveDebugConfigurationWithSubstitutedVariables(
 	) {
 		debugConfiguration.vmArgs += " -Dspring.application.admin.enabled=true";
 	}
+
 	if (debugConfiguration.vmArgs.indexOf("-Dspring.boot.project.name=") < 0) {
 		debugConfiguration.vmArgs += ` -Dspring.boot.project.name=${debugConfiguration.projectName}`;
 	}
@@ -563,5 +594,6 @@ function parseJMXPort(vmArgs: string): number | undefined {
 
 		return parseInt(port);
 	}
+
 	return undefined;
 }

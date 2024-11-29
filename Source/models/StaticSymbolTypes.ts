@@ -31,13 +31,16 @@ export class StaticBean extends StaticSymbol {
 
 export class StaticEndpoint extends StaticSymbol {
 	public pattern: string | undefined;
+
 	public method: string | undefined;
 
 	constructor(raw: lsp.SymbolInformation) {
 		super(raw);
 
 		const [pattern, method] = this.raw.name.replace(/^@/, "").split(" -- ");
+
 		this.pattern = pattern;
+
 		this.method = method;
 	}
 
@@ -47,6 +50,7 @@ export class StaticEndpoint extends StaticSymbol {
 		if (this.method) {
 			label += ` [${this.method}]`;
 		}
+
 		return label;
 	}
 }
