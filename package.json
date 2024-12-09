@@ -613,7 +613,7 @@
 	],
 	"icon": "resources/logo.png",
 	"main": "./dist/extension",
-	"name": "vscode-spring-boot-dashboard",
+	"name": "@codeeditorland/spring-boot-dashboard",
 	"preview": true,
 	"scripts": {
 		"compile": "tsc -p .",
