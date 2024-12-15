@@ -104,9 +104,7 @@ function setDecorationOptions(
 
 	for (
 		let lineNumber = 0;
-
 		lineNumber < textEditor.document.lineCount;
-
 		lineNumber++
 	) {
 		if (beanLines.includes(lineNumber)) {
